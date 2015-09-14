@@ -86,6 +86,12 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <falcon.ino>
 #include <Controller.cpp>
 #include <Controller.h>
+#include <DEVICE_COMMON.h>
+#include <DEVICE_LIDAR_CONTROLLER.h>
+#include <DEVICE_RC_TRANSMITTER.h>
+#include <DEVICE_SERIAL_RECEIVER.h>
+#include <DEVICE_SERIAL_TRANSMITTER.h>
+#include <DEVICE_UART_RC_BRIDGE.h>
 #include <EEPROMAnything.h>
 #include <FSLPsensor.cpp>
 #include <FSLPsensor.h>

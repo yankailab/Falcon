@@ -1,7 +1,7 @@
 #pragma once
 
 #include "falconcommon.h"
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #include "variables.h"
 
 
@@ -28,6 +28,16 @@ public:
 	void sendHostHeartBeat(void);
 
 	void vehicleCommand(void);
+
+#ifdef LIDAR_CONTROLLER
+	Serial_* m_pHostSerial;
+	CMD_STREAM m_uartCMD;
+	HardwareSerial* m_pUartSerial;
+
+	bool receiveFromUART(void);
+	void uartCommand(void);
+	void sendUartHeartBeat(void);
+#endif
 
 #ifdef RC_TRANSMITTER
 //	Serial_* m_pHostSerial;

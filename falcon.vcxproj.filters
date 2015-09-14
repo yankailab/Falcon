@@ -78,6 +78,24 @@
     <ClInclude Include="UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DEVICE_COMMON.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEVICE_LIDAR_CONTROLLER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEVICE_UART_RC_BRIDGE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEVICE_RC_TRANSMITTER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEVICE_SERIAL_RECEIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DEVICE_SERIAL_TRANSMITTER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FSLPsensor.cpp">

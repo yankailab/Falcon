@@ -7,9 +7,10 @@
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
 //#define SERIAL_RECEIVER
-#define UART_RC_BRIDGE
+//#define UART_RC_BRIDGE
+#define LIDAR_CONTROLLER
 
-//#define USB_DEBUG
+#define USB_DEBUG
 
 //
 // Vehicle Link
@@ -65,11 +66,9 @@
 #define SHORT_BEEP 150
 #define LONG_BEEP 500
 
-#ifdef UART_RC_BRIDGE
 #define RC_CHANNEL_NUM	8				//set the number of chanels
 #define PPM_ON_STATE	0				//set polarity of the pulses: 1 is positive, 0 is negative
 #define PPM_OUTPUT_PIN	5				//set PPM signal output pin on the arduino
-#endif
 
 #ifdef RC_TRANSMITTER
 #define RC_CHANNEL_NUM	8				//set the number of chanels

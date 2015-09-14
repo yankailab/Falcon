@@ -135,9 +135,6 @@ void PPM_init(config_t config)
 		g_ppm[i] = DEFAULT_PWM;
 	}
 
-//	g_ppm[2] = 990;
-//	g_ppm[3] = 1165;
-
 	pinMode(PPM_OUTPUT_PIN, OUTPUT);
 	digitalWrite(PPM_OUTPUT_PIN, !PPM_ON_STATE); //set the PPM signal pin to the default state (off)
 	
