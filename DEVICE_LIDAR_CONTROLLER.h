@@ -17,7 +17,8 @@ struct LIDAR_UNIT
 	uint8_t m_pinTrigger;
 
 	uint8_t m_ppmChannel;
-
+	uint8_t m_P;
+	uint8_t m_D;
 
 
 };
@@ -28,6 +29,10 @@ LIDAR_UNIT* pLidarUP;
 LIDAR_UNIT* pLidarL;
 LIDAR_UNIT* pLidarR;
 LIDAR_UNIT* pLidarDOWN;
+
+//Yaw, Pitch, Roll
+float g_attitude[3];
+unsigned long g_dist;
 
 
 void ppmInt()
@@ -50,32 +55,30 @@ void ppmInt()
 
 void deviceSetup()
 {
-	g_pRFSerial->begin(115200);
-
-	//Pin setup
-//	pinMode(7, INPUT);
-//	pinMode(5, OUTPUT);
-
-
 #ifdef USB_DEBUG
 	// wait for Leonardo enumeration, others continue immediately
 	while (!(*g_pUSBSerial));
 #endif
-
 
 	if (*g_pUSBSerial)
 	{
 		//To host side (Android device etc.)
 		g_pUSBSerial->begin(115200);
 		g_bHostConnected = true;
-		g_pUSBSerial->println(F("FALCON_ON"));
+		g_pUSBSerial->println(F("FALCON_LIDAR"));
 	}
+
+	g_pRFSerial->begin(115200);
+
+	//Pin setup
+	pinMode(PPM_INPUT_PIN, INPUT);
+	pinMode(PPM_OUTPUT_PIN, OUTPUT);
 
 	//Init PPM generator
 	PPM_init(config);
 
 	//Vehicle Link
-	g_VLink.m_pConfig = &config;
+/*	g_VLink.m_pConfig = &config;
 	g_VLink.init();
 	g_VLink.m_pOprMode = &g_opeMode;
 	g_VLink.m_pUartSerial = g_pRFSerial;
@@ -86,6 +89,7 @@ void deviceSetup()
 	g_VLink.m_channelValues[config.controlChannel[ROLL].ppmIdx] = config.controlChannel[ROLL].center;
 	g_VLink.m_channelValues[config.throttleChannel.ppmIdx] = config.PWMLenFrom;
 	g_VLink.m_channelValues[config.buttonChannel[0].ppmIdx] = config.buttonChannel[0].modePPM[0];
+*/
 
 	//Enable Arduino interrupt detection
 	attachInterrupt(4, ppmInt, RISING);
@@ -115,9 +119,6 @@ void deviceSetup()
 		pinMode(g_pLidar[i].m_pinTrigger, OUTPUT);
 	}
 
-
-
-
 }
 
 
@@ -132,17 +133,31 @@ void deviceLoop()
 		if (g_pLidar[i].m_distCM == 0)
 		{
 			digitalWrite(g_pLidar[i].m_pinTrigger, LOW);
-			delayMicroseconds(100);
+			delayMicroseconds(10);
 			digitalWrite(g_pLidar[i].m_pinTrigger, HIGH);
 		}
 	}
 
-	// Left
-/*	if (pLidarL->m_distCM < config)
-	{
+	//Update switches
+	//Reset All Lidars
+	//Save to flash
 
+
+	//Update Attitude, TODO: change to using IMU
+	g_attitude[PITCH] = cos(abs(g_ppm[config.controlChannel[PITCH].ppmIdx] - 1500)*0.002);
+	g_attitude[ROLL] = cos(abs(g_ppm[config.controlChannel[ROLL].ppmIdx] - 1500)*0.002);
+
+	pLidarL->m_distCM *= g_attitude[ROLL];
+	pLidarR->m_distCM *= g_attitude[ROLL];
+	pLidarUP->m_distCM *= g_attitude[PITCH];
+
+
+	// Left
+	g_dist = pLidarL->m_distCM - config.lidarLim[ROLL];
+	if (g_dist < 0)
+	{
+		g_ppm[ROLL] = 1600;
 	}
-	*/
 
 	// Right
 
@@ -195,6 +210,9 @@ void deviceLoop()
 		}
 		break;
 	case 3:
+		//TODO: adjust lidarLim
+		break;
+	case 5:
 		g_counter = 0;
 		break;
 
