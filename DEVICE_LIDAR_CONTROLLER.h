@@ -1,6 +1,6 @@
 
-
-Serial_* g_pUSBSerial;
+#define LD_TIMEOUT 60000
+#define LD_NUM 4
 
 volatile uint8_t val;
 volatile unsigned long timeNow;
@@ -8,9 +8,27 @@ volatile unsigned long timeOld;
 volatile unsigned int ppmIdx;
 volatile unsigned int pulseLength;
 
-unsigned long laser1;
-unsigned long laser2;
-unsigned long laser3;
+Serial_* g_pUSBSerial;
+
+struct LIDAR_UNIT
+{
+	unsigned long m_distCM;
+	uint8_t	m_pinPWM;
+	uint8_t m_pinTrigger;
+
+	uint8_t m_ppmChannel;
+
+
+
+};
+
+LIDAR_UNIT g_pLidar[LD_NUM];
+
+LIDAR_UNIT* pLidarUP;
+LIDAR_UNIT* pLidarL;
+LIDAR_UNIT* pLidarR;
+LIDAR_UNIT* pLidarDOWN;
+
 
 void ppmInt()
 {
@@ -33,6 +51,10 @@ void ppmInt()
 void deviceSetup()
 {
 	g_pRFSerial->begin(115200);
+
+	//Pin setup
+//	pinMode(7, INPUT);
+//	pinMode(5, OUTPUT);
 
 
 #ifdef USB_DEBUG
@@ -65,15 +87,36 @@ void deviceSetup()
 	g_VLink.m_channelValues[config.throttleChannel.ppmIdx] = config.PWMLenFrom;
 	g_VLink.m_channelValues[config.buttonChannel[0].ppmIdx] = config.buttonChannel[0].modePPM[0];
 
-	//Temporal test
-	// enable Arduino interrupt detection
+	//Enable Arduino interrupt detection
 	attachInterrupt(4, ppmInt, RISING);
 	timeNow = 0;
 	timeOld = 0;
 	ppmIdx = 0;
-	pinMode(A1, INPUT);
-	pinMode(A2, INPUT);
-	pinMode(A3, INPUT);
+
+	//Lidar
+	g_pLidar[0].m_pinPWM = 21;
+	g_pLidar[1].m_pinPWM = 20;
+	g_pLidar[2].m_pinPWM = 19;
+	g_pLidar[3].m_pinPWM = 18;
+
+	g_pLidar[0].m_pinTrigger = 15;
+	g_pLidar[1].m_pinTrigger = 14;
+	g_pLidar[2].m_pinTrigger = 16;
+	g_pLidar[3].m_pinTrigger = 10;
+
+	pLidarL = &g_pLidar[0];
+	pLidarUP = &g_pLidar[1];
+	pLidarR = &g_pLidar[2];
+	pLidarDOWN = &g_pLidar[3];
+
+	for (int i = 0; i < LD_NUM; i++)
+	{
+		pinMode(g_pLidar[i].m_pinPWM, INPUT);
+		pinMode(g_pLidar[i].m_pinTrigger, OUTPUT);
+	}
+
+
+
 
 }
 
@@ -81,62 +124,35 @@ void deviceSetup()
 void deviceLoop()
 {
 	int i;
-	if (g_bHostConnected)
+
+	// Update Lidar sensors
+	for (i = 0; i < LD_NUM; i++)
 	{
-		laser1 = pulseIn(A1, HIGH); // Count how long the pulse is high in microseconds
-		laser2 = pulseIn(A2, HIGH);
-		laser3 = pulseIn(A3, HIGH);
-
-		laser1 *= 0.1;
-		laser2 *= 0.1;
-		laser3 *= 0.1;
-
-
-		Serial.print(laser1);
-		Serial.print(" ");
-		Serial.print(laser2);
-		Serial.print(" ");
-		Serial.print(laser3);
-		Serial.print(" ");
-
-		g_pUSBSerial->print(g_ppm[0]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[1]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[2]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[3]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[4]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[5]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[6]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->println(g_ppm[7]);
-	}
-	return;
-
-	if (g_bHostConnected)
-	{
-		if (g_VLink.receiveFromHost())
+		g_pLidar[i].m_distCM = pulseIn(g_pLidar[i].m_pinPWM, HIGH, LD_TIMEOUT)*0.1; //microseconds, 10 usec = 1cm
+		if (g_pLidar[i].m_distCM == 0)
 		{
-			for (i = 0; i < RC_CHANNEL_NUM; i++)
-			{
-				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 1000, 2000);
-			}
+			digitalWrite(g_pLidar[i].m_pinTrigger, LOW);
+			delayMicroseconds(100);
+			digitalWrite(g_pLidar[i].m_pinTrigger, HIGH);
 		}
 	}
-	else
+
+	// Left
+/*	if (pLidarL->m_distCM < config)
 	{
-		if (g_VLink.receiveFromUART())
-		{
-			for (i = 0; i < RC_CHANNEL_NUM; i++)
-			{
-				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 1000, 2000);
-			}
-		}
+
 	}
+	*/
+
+	// Right
+
+
+	// Up
+
+	// Altitude
+
+
+
 
 
 	// slow rate actions
@@ -145,14 +161,30 @@ void deviceLoop()
 	case 1:
 		if (g_bHostConnected)
 		{
-			g_VLink.sendHostHeartBeat();
-		}
-		else
-		{
-			g_VLink.sendUartHeartBeat();
+			for (i = 0; i < LD_NUM; i++)
+			{
+				Serial.print(g_pLidar[i].m_distCM);
+				Serial.print(" ");
+			}
+
+			g_pUSBSerial->print(g_ppm[0]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[1]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[2]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[3]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[4]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[5]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[6]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->println(g_ppm[7]);
 		}
 		break;
-	case 10:
+	case 2:
 		if (!g_bHostConnected)
 		{
 			if (Serial)
@@ -162,7 +194,7 @@ void deviceLoop()
 			}
 		}
 		break;
-	case 100:
+	case 3:
 		g_counter = 0;
 		break;
 

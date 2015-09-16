@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 9
+#define VERSION 10
 
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
@@ -10,7 +10,7 @@
 //#define UART_RC_BRIDGE
 #define LIDAR_CONTROLLER
 
-#define USB_DEBUG
+//#define USB_DEBUG
 
 //
 // Vehicle Link

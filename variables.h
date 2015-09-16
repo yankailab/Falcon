@@ -47,5 +47,8 @@ struct config_t
 	Switch_Channel buttonChannel[2];
 
 	int16_t thresholdBTN;
+
+
+	unsigned long lidarLim[4];
 };// config;
 
