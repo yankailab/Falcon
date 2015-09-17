@@ -36,14 +36,14 @@ void setDefaultParameters()
 	config.PWMLenTo = 2000;
 	config.PWMCenter = 1500;
 
-	config.controlChannel[PITCH].ppmIdx = 0;
+	config.controlChannel[PITCH].ppmIdx = 1;
 	config.controlChannel[PITCH].center = 1500;
 	config.controlChannel[PITCH].deadzone = 50;
 	config.controlChannel[PITCH].factor = 500;
 	config.controlChannel[PITCH].lowerLimit = -500;
 	config.controlChannel[PITCH].upperLimit = 500;
 
-	config.controlChannel[ROLL].ppmIdx = 1;
+	config.controlChannel[ROLL].ppmIdx = 0;
 	config.controlChannel[ROLL].center = 1500;
 	config.controlChannel[ROLL].deadzone = 50;
 	config.controlChannel[ROLL].factor = -500;
@@ -84,4 +84,12 @@ void setDefaultParameters()
 	config.buttonChannel[0].modePPM[5] = 1815;
 
 	config.thresholdBTN = 1;
+
+	config.lidarLim[config.controlChannel[ROLL].ppmIdx] = 0;
+	config.lidarLim[config.controlChannel[PITCH].ppmIdx] = 0;
+	config.lidarLim[config.throttleChannel.ppmIdx] = 0;
+
+	config.cAvoidPWM[config.controlChannel[ROLL].ppmIdx] = 100;
+	config.cAvoidPWM[config.controlChannel[PITCH].ppmIdx] = 100;
+	config.cAvoidPWM[config.throttleChannel.ppmIdx] = 150;
 }

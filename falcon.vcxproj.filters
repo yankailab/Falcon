@@ -60,9 +60,6 @@
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPM.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MPU6000.h">
       <Filter>Header Files</Filter>
     </ClInclude>

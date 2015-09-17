@@ -19,6 +19,7 @@ UI g_UI;
 #include "PPMGenerator.h"
 
 #include "DEVICE_COMMON.h"
+
 //#include "DEVICE_SERIAL_TRANSMITTER.h"
 //#include "DEVICE_SERIAL_RECEIVER.h"
 //#include "DEVICE_RC_TRANSMITTER.h"
@@ -26,8 +27,6 @@ UI g_UI;
 #include "DEVICE_LIDAR_CONTROLLER.h"
 
 #include "util.h"
-
-
 
 
 //INITIAL SETUP 

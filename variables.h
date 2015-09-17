@@ -45,10 +45,9 @@ struct config_t
 	FSLPChannel yawChannel;
 
 	Switch_Channel buttonChannel[2];
-
 	int16_t thresholdBTN;
 
-
-	unsigned long lidarLim[4];
+	long lidarLim[4];
+	long cAvoidPWM[4];
 };// config;
 

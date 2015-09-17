@@ -14,4 +14,4 @@ bool g_bBootSuccess = true;
 bool g_bHostConnected = false;
 
 //General
-uint8_t g_opeMode = /*OPE_SERIAL_BRIDGE;//*/OPE_RC_BRIDGE;// OPE_MANUAL;
+uint8_t g_opeMode;

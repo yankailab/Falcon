@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 10
+#define VERSION 15
 
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
@@ -10,7 +10,7 @@
 //#define UART_RC_BRIDGE
 #define LIDAR_CONTROLLER
 
-//#define USB_DEBUG
+#define USB_DEBUG
 
 //
 // Vehicle Link
@@ -42,6 +42,9 @@
 #define OPE_AUTO 4
 #define OPE_RC_BRIDGE 5
 #define OPE_BOOT 6
+
+#define OPE_PPM_THROUGH 7
+#define OPE_COLLISION_AVOID 8
 
 //
 // RC Channel
@@ -86,6 +89,13 @@
 #define PPM_OUTPUT_PIN	5				//set PPM signal output pin on the arduino
 
 #endif
+
+
+#define SETBIT_ON(x,y) (x|=(1<<y))
+#define SETBIT_OFF(x,y) (x&=(~(1<<y)))
+#define BIT_ON(x,y) (x&(1<<y))
+
+
 
 
 
