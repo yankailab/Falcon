@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 15
+#define VERSION 19
 
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
@@ -44,7 +44,9 @@
 #define OPE_BOOT 6
 
 #define OPE_PPM_THROUGH 7
-#define OPE_COLLISION_AVOID 8
+#define OPE_UP_COLLISION_AVOID 8
+#define OPE_ALL_COLLISION_AVOID 9
+#define OPE_REFERENCE_FIX 10
 
 //
 // RC Channel

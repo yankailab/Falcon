@@ -91,5 +91,5 @@ void setDefaultParameters()
 
 	config.cAvoidPWM[config.controlChannel[ROLL].ppmIdx] = 100;
 	config.cAvoidPWM[config.controlChannel[PITCH].ppmIdx] = 100;
-	config.cAvoidPWM[config.throttleChannel.ppmIdx] = 150;
+	config.cAvoidPWM[config.throttleChannel.ppmIdx] = 60;
 }
