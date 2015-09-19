@@ -383,7 +383,6 @@ void VehicleLink::hostCommand(void)
 		if (val < 0)return;
 		else if (val > OPE_BOOT)return;
 
-		//			tone(BUZZER_PIN, 900, SHORT_BEEP);
 		*m_pOprMode = val;
 		if (*m_pOprMode == OPE_ALT_HOLD)
 		{

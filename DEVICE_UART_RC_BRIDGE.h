@@ -24,7 +24,6 @@ void deviceSetup()
 		g_pUSBSerial->println(F("FALCON_ON"));
 	}
 
-
 	//Init PPM generator
 	PPM_init(config);
 
@@ -46,7 +45,7 @@ void deviceSetup()
 	g_VLink.m_channelValues[config.throttleChannel.ppmIdx] = config.PWMLenFrom;
 	g_VLink.m_channelValues[config.buttonChannel[0].ppmIdx] = config.buttonChannel[0].modePPM[0];
 
-	g_opeMode = OPE_SERIAL_BRIDGE;
+	g_opeMode = OPE_RC_BRIDGE;
 
 }
 

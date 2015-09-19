@@ -28,7 +28,6 @@ UI g_UI;
 
 #include "util.h"
 
-
 //INITIAL SETUP 
 void setup() 
 {

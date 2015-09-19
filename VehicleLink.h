@@ -46,6 +46,7 @@ public:
 
 #ifdef UART_RC_BRIDGE
 
+	//TODO, recover for Atmega A32U4
 /*	Serial_* m_pHostSerial;
 	HardwareSerial* m_pUartSerial;
 	bool receiveFromUART(void);
