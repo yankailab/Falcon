@@ -209,6 +209,7 @@ void VehicleLink::init(void)
 	m_hostCMD.m_cmd = 0;
 }
 
+#ifndef ATMEGA_A328
 bool VehicleLink::receiveFromUART(void)
 {
 	byte	inByte;
@@ -311,7 +312,7 @@ void VehicleLink::sendUartHeartBeat(void)
 	m_pUartSerial->write(*m_pOprMode);
 
 }
-
+#endif
 
 /* */
 bool VehicleLink::receiveFromHost(void)

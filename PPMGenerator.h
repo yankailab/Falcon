@@ -1,12 +1,9 @@
 ﻿#pragma once
 #include "falconcommon.h"
 
-#define ATMEGA_A32U4
-//#define ATMEGA_A328
-
-
 #ifdef ATMEGA_A328
-	#define default_servo_value 250
+/*
+#define default_servo_value 250
 //1500  //set the default servo value
 	#define PPM_FrLen	3600
 //7500
@@ -14,6 +11,10 @@
 	#define PPM_PulseLen	80
 //500  //set the pulse length
 int waitTime;
+*/
+
+#define DEFAULT_PWM 1500
+
 #endif
 
 #ifdef ATMEGA_A32U4
@@ -28,7 +29,7 @@ uint16_t PPM_PulseLen;		//500		//set the pulse length
 
 #ifdef ATMEGA_A328
 
-/* */
+/*
 ISR(TIMER2_COMPA_vect)
 {						//leave this alone
 	static boolean	state = true;
@@ -79,6 +80,43 @@ ISR(TIMER2_COMPA_vect)
 			waitTime = 0;	//(ppm[cur_chan_numb] - PPM_PulseLen) * 2 - 255;
 			OCR2A = (ppm[cur_chan_numb] - PPM_PulseLen);
 			calc_rest = calc_rest + ppm[cur_chan_numb];
+			cur_chan_numb++;
+		}
+	}
+}
+*/
+
+ISR(TIMER1_COMPA_vect)
+{
+	static boolean state = true;
+	TCNT1 = 0;
+
+	if (state)
+	{	//start pulse
+		digitalWrite(PPM_OUTPUT_PIN, PPM_ON_STATE);
+		OCR1A = PPM_PulseLen * 2;
+		state = false;
+	}
+	else
+	{
+		//end pulse and calculate when to start the next pulse
+		static byte			cur_chan_numb;
+		static unsigned int calc_rest;
+
+		digitalWrite(PPM_OUTPUT_PIN, !PPM_ON_STATE);
+		state = true;
+
+		if (cur_chan_numb >= RC_CHANNEL_NUM)
+		{
+			cur_chan_numb = 0;
+			calc_rest = calc_rest + PPM_PulseLen;
+			OCR1A = (PPM_FrLen - calc_rest) * 2;
+			calc_rest = 0;
+		}
+		else
+		{
+			OCR1A = (g_ppm[cur_chan_numb] - PPM_PulseLen) * 2;
+			calc_rest = calc_rest + g_ppm[cur_chan_numb];
 			cur_chan_numb++;
 		}
 	}
@@ -143,6 +181,7 @@ void PPM_init(config_t config)
 
 
 #ifdef ATMEGA_A328
+	/*
 	waitTime = 0;
 
 	cli();
@@ -167,6 +206,19 @@ void PPM_init(config_t config)
 	// enable timer compare interrupt
 	TIMSK2 |= (1 << OCIE2A);
 	sei();
+	*/
+
+	cli();
+	TCCR1A = 0;						// set entire TCCR1 register to 0
+	TCCR1B = 0;
+	TCNT1 = 0;
+
+	OCR1A = 100;					// compare match register, change this
+	TCCR1B |= (1 << WGM12);			// turn on CTC mode
+	TCCR1B |= (1 << CS11);			// 8 prescaler: 0,5 microseconds at 16mhz
+	TIMSK1 |= (1 << OCIE1A);		// enable timer compare interrupt
+	sei();
+
 #endif
 
 #ifdef ATMEGA_A32U4

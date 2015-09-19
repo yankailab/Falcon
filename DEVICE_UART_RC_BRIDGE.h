@@ -1,10 +1,15 @@
 
+#ifndef ATMEGA_A328
 Serial_* g_pUSBSerial;
-
+#else
+HardwareSerial* g_pUSBSerial;
+#endif
 
 void deviceSetup()
 {
+#ifndef ATMEGA_A328
 	g_pRFSerial->begin(115200);
+#endif
 
 #ifdef USB_DEBUG
 	// wait for Leonardo enumeration, others continue immediately
@@ -27,8 +32,13 @@ void deviceSetup()
 	g_VLink.m_pConfig = &config;
 	g_VLink.init();
 	g_VLink.m_pOprMode = &g_opeMode;
-	g_VLink.m_pUartSerial = g_pRFSerial;
+
+#ifndef ATMEGA_A328
 	g_VLink.m_pHostSerial = g_pUSBSerial;
+	g_VLink.m_pUartSerial = g_pRFSerial;
+#else
+	g_VLink.m_pHostSerial = g_pUSBSerial;
+#endif
 
 	g_VLink.m_channelValues[config.yawChannel.ppmIdx] = config.PWMCenter;
 	g_VLink.m_channelValues[config.controlChannel[PITCH].ppmIdx] = config.controlChannel[PITCH].center;
@@ -36,53 +46,21 @@ void deviceSetup()
 	g_VLink.m_channelValues[config.throttleChannel.ppmIdx] = config.PWMLenFrom;
 	g_VLink.m_channelValues[config.buttonChannel[0].ppmIdx] = config.buttonChannel[0].modePPM[0];
 
+	g_opeMode = OPE_SERIAL_BRIDGE;
+
 }
 
 void deviceLoop()
 {
-		int i;
-	if (g_bHostConnected)
-	{
-		laser1 = pulseIn(A1, HIGH); // Count how long the pulse is high in microseconds
-		laser2 = pulseIn(A2, HIGH);
-		laser3 = pulseIn(A3, HIGH);
-
-		laser1 *= 0.1;
-		laser2 *= 0.1;
-		laser3 *= 0.1;
-
-
-		Serial.print(laser1);
-		Serial.print(" ");
-		Serial.print(laser2);
-		Serial.print(" ");
-		Serial.print(laser3);
-		Serial.print(" ");
-
-		g_pUSBSerial->print(g_ppm[0]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[1]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[2]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[3]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[4]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[5]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->print(g_ppm[6]);
-		g_pUSBSerial->print(" ");
-		g_pUSBSerial->println(g_ppm[7]);
-	}
-	return;
-	
+	int i;
+	/*
 	if(g_opeMode==OPE_SERIAL_BRIDGE)
 	{
 		Serial_Bridge();
 		return;
 	}
-	
+	*/
+
 	if (g_bHostConnected)
 	{
 		if (g_VLink.receiveFromHost())
@@ -95,6 +73,7 @@ void deviceLoop()
 	}
 	else
 	{
+#ifndef ATMEGA_A328
 		if (g_VLink.receiveFromUART())
 		{
 			for (i = 0; i < RC_CHANNEL_NUM; i++)
@@ -102,6 +81,7 @@ void deviceLoop()
 				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 1000, 2000);
 			}
 		}
+#endif
 	}
 
 
@@ -115,7 +95,9 @@ void deviceLoop()
 		}
 		else
 		{
+#ifndef ATMEGA_A328
 			g_VLink.sendUartHeartBeat();
+#endif
 		}
 		break;
 	case 10:

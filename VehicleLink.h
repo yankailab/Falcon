@@ -45,13 +45,18 @@ public:
 #endif
 
 #ifdef UART_RC_BRIDGE
-	Serial_* m_pHostSerial;
-	CMD_STREAM m_uartCMD;
-	HardwareSerial* m_pUartSerial;
 
+/*	Serial_* m_pHostSerial;
+	HardwareSerial* m_pUartSerial;
 	bool receiveFromUART(void);
 	void uartCommand(void);
 	void sendUartHeartBeat(void);
+	*/
+	HardwareSerial* m_pHostSerial;
+
+	CMD_STREAM m_uartCMD;
+
+
 #endif
 
 #ifdef SERIAL_RECEIVER

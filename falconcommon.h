@@ -4,11 +4,14 @@
 
 #define VERSION 19
 
+//#define ATMEGA_A32U4
+#define ATMEGA_A328
+
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
 //#define SERIAL_RECEIVER
-//#define UART_RC_BRIDGE
-#define LIDAR_CONTROLLER
+#define UART_RC_BRIDGE
+//#define LIDAR_CONTROLLER
 
 #define USB_DEBUG
 
