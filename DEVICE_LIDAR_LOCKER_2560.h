@@ -126,7 +126,8 @@ void deviceSetup()
 		return;
 	}
 	// enable Arduino interrupt detection
-	attachInterrupt(6, dmpDataReady, RISING);
+//	attachInterrupt(2, dmpDataReady, RISING);
+	//TODO? do we need this?
 
 	// if programming failed, don't try to do anything
 	if (!g_IMU.m_dmpReady)
@@ -143,12 +144,12 @@ void deviceSetup()
 
 	//Init PPM generator
 	PPM_init(config);
-	//Enable Arduino interrupt detection
-//	attachInterrupt(4, ppmInt, RISING);
-	//	attachInterrupt(3, ppmInt, RISING);
 	timeNow = 0;
 	timeOld = 0;
 	ppmIdx = 0;
+	//Enable Arduino interrupt detection
+	attachInterrupt(4, ppmInt, RISING);
+	//	attachInterrupt(3, ppmInt, RISING);
 
 	g_pUSBSerial->println(F("FALCON_START"));
 }
@@ -184,30 +185,8 @@ void deviceLoop()
 	// slow rate actions
 	switch (g_counter)
 	{
+
 	case 1:
-		//			g_VLink.receiveFromRF();
-/*		if (g_heartBeatCounter++ >= 10)
-		{
-			g_VLink.sendHostHeartBeat();
-			g_heartBeatCounter = 0;
-		}
-*/		break;
-	case 2:
-/*		if (g_opeMode != OPE_RC_BRIDGE)
-		{
-			g_VLink.receiveFromHost();
-		}
-*/		break;
-
-	case 3:
-//		g_UI.draw(g_opeMode, (int16_t*)g_ppm);	//g_VLink.m_channelValues
-		break;
-
-	case 4:
-//		g_Controller.updateYaw();
-		break;
-
-	case 5:
 //		g_Controller.updateThrottle();
 
 		if (g_bPrintIMU)
@@ -239,7 +218,26 @@ void deviceLoop()
 			g_pUSBSerial->print("\t");
 			g_pUSBSerial->print(g_IMU.m_ypr[1]);
 			g_pUSBSerial->print("\t");
-			g_pUSBSerial->println(g_IMU.m_ypr[2]);
+			g_pUSBSerial->print(g_IMU.m_ypr[2]);
+
+
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[0]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[1]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[2]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[3]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[4]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[5]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->print(g_ppm[6]);
+			g_pUSBSerial->print(" ");
+			g_pUSBSerial->println(g_ppm[7]);
+
 /*			g_pUSBSerial->print("\tpre:\t");
 			g_pUSBSerial->print(g_FSLP.m_pressure);
 			g_pUSBSerial->print("\tpos:\t");

@@ -94,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="IMU.h" />
     <ClInclude Include="DEVICE_LIDAR_CONTROLLER.h" />
+    <ClInclude Include="LIDARLite.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClInclude Include="MPU6000.h" />
     <ClInclude Include="MPU6050.h">
       <FileType>CppCode</FileType>
@@ -120,6 +123,7 @@
     <ClCompile Include="FSLPsensor.cpp" />
     <ClCompile Include="I2Cdev.cpp" />
     <ClCompile Include="IMU.cpp" />
+    <ClCompile Include="LIDARLite.cpp" />
     <ClCompile Include="MPU6000.cpp" />
     <ClCompile Include="MPU6050.cpp" />
     <ClCompile Include="SerialCommand.cpp" />

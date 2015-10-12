@@ -96,6 +96,9 @@
     <ClInclude Include="DEVICE_LIDAR_LOCKER_2560.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LIDARLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FSLPsensor.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LIDARLite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
