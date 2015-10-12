@@ -113,9 +113,6 @@
     <ClCompile Include="MPU6050.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPMGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MPU6000.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

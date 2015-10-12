@@ -122,7 +122,6 @@
     <ClCompile Include="IMU.cpp" />
     <ClCompile Include="MPU6000.cpp" />
     <ClCompile Include="MPU6050.cpp" />
-    <ClCompile Include="PPMGenerator.cpp" />
     <ClCompile Include="SerialCommand.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="VehicleLink.cpp" />

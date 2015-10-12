@@ -79,7 +79,7 @@
 
 #define RC_CHANNEL_NUM	8				//set the number of chanels
 #define PPM_ON_STATE	0				//set polarity of the pulses: 1 is positive, 0 is negative
-#define PPM_OUTPUT_PIN	5				//set PPM signal output pin on the arduino
+#define PPM_OUTPUT_PIN	A7				//5 for arduino pro micro,set PPM signal output pin on the arduino
 #define PPM_INPUT_PIN 7
 
 #ifdef RC_TRANSMITTER

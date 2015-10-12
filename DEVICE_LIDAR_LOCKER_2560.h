@@ -18,6 +18,72 @@ int sensorPins[] = { A0, A1, A2 }; // Array of pins connected to the sensor Powe
 unsigned char addresses[] = { 0x66, 0x68, 0x64 };
 LIDARLite gLidar;
 
+
+
+volatile uint8_t val;
+volatile unsigned long timeNow;
+volatile unsigned long timeOld;
+volatile unsigned int ppmIdx;
+volatile unsigned int pulseLength;
+
+struct LIDAR_UNIT
+{
+	long m_distCM;
+	uint8_t	m_pinPWM;
+	uint8_t m_pinTrigger;
+
+	uint8_t m_ppmChannel;
+	uint8_t m_P;
+	uint8_t m_D;
+
+	int m_counter;
+	int m_priority;
+
+
+};
+
+LIDAR_UNIT g_LidarUP;
+LIDAR_UNIT g_LidarL;
+LIDAR_UNIT g_LidarR;
+LIDAR_UNIT g_LidarDOWN;
+
+uint16_t g_inputPPM[RC_CHANNEL_NUM];
+
+void ppmInt()
+{
+	timeOld = timeNow;
+	timeNow = micros();
+	pulseLength = timeNow - timeOld;
+
+	if (pulseLength >= 2500)
+	{
+		ppmIdx = 0;
+	}
+	else
+	{
+//		g_inputPPM[ppmIdx] = pulseLength; 
+		g_ppm[ppmIdx] = pulseLength;
+/*		if (BIT_ON(g_bPPMthrough, ppmIdx))
+		{
+			if (ppmIdx == g_ppmTHROTTLE)
+			{
+				if (g_opeMode == OPE_UP_COLLISION_AVOID)
+				{
+					if (pulseLength >= config.PWM_THR_UP_Lim)
+					{
+						pulseLength = config.PWM_THR_UP_Lim;
+					}
+				}
+			}
+
+			g_ppm[ppmIdx] = pulseLength;
+		}
+*/		ppmIdx++;
+	}
+}
+
+
+
 void deviceSetup()
 {
 
@@ -38,9 +104,6 @@ void deviceSetup()
 //	pinMode(BATT_SENSE, INPUT);
 //	pinMode(BUZZER_PIN, OUTPUT);
 
-	//Init PPM generator
-//	PPM_init(config);
-
 	//Vehicle Link
 /*	g_VLink.m_pConfig = &config;
 	g_VLink.init();
@@ -60,10 +123,8 @@ void deviceSetup()
 	{
 		g_pUSBSerial->println(F("IMU_FAIL"));
 		g_bBootSuccess = false;
-//		tone(BUZZER_PIN, 1000, LONG_BEEP);
 		return;
 	}
-
 	// enable Arduino interrupt detection
 	attachInterrupt(6, dmpDataReady, RISING);
 
@@ -80,7 +141,14 @@ void deviceSetup()
 	gLidar.changeAddressMultiPwrEn(3, sensorPins, addresses, false);
 
 
-
+	//Init PPM generator
+	PPM_init(config);
+	//Enable Arduino interrupt detection
+//	attachInterrupt(4, ppmInt, RISING);
+	//	attachInterrupt(3, ppmInt, RISING);
+	timeNow = 0;
+	timeOld = 0;
+	ppmIdx = 0;
 
 	g_pUSBSerial->println(F("FALCON_START"));
 }
@@ -105,11 +173,11 @@ void deviceLoop()
 //			g_Controller.updateAttitude(PITCH, g_IMU.m_ypr[2]);
 //			g_Controller.updateAttitude(ROLL, g_IMU.m_ypr[1]);
 
-			for (i = 0; i < RC_CHANNEL_NUM; i++)
+/*			for (i = 0; i < RC_CHANNEL_NUM; i++)
 			{
 				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 980, 2025);
 			}
-
+			*/
 			//			printf("MPU Updated\n");
 		}
 
