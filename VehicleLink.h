@@ -39,6 +39,16 @@ public:
 	void sendUartHeartBeat(void);
 #endif
 
+#ifdef LIDAR_LOCKER_2560
+	HardwareSerial* m_pHostSerial;
+	CMD_STREAM m_uartCMD;
+//	HardwareSerial* m_pUartSerial;
+
+	bool receiveFromUART(void);
+	void uartCommand(void);
+	void sendUartHeartBeat(void);
+#endif
+
 #ifdef RC_TRANSMITTER
 //	Serial_* m_pHostSerial;
 	HardwareSerial* m_pHostSerial;

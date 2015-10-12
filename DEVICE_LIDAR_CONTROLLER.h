@@ -72,6 +72,17 @@ void ppmInt()
 		g_inputPPM[ppmIdx] = pulseLength;
 		if (BIT_ON(g_bPPMthrough,ppmIdx))
 		{
+			if (ppmIdx == g_ppmTHROTTLE)
+			{
+				if (g_opeMode == OPE_UP_COLLISION_AVOID)
+				{
+					if (pulseLength >= config.PWM_THR_UP_Lim)
+					{
+						pulseLength = config.PWM_THR_UP_Lim;
+					}
+				}
+			}
+
 			g_ppm[ppmIdx] = pulseLength;
 		}
 		ppmIdx++;
@@ -98,19 +109,6 @@ void deviceSetup()
 	}
 
 	g_pRFSerial->begin(115200);
-
-	//Pin setup
-	pinMode(PPM_INPUT_PIN, INPUT);
-	pinMode(PPM_OUTPUT_PIN, OUTPUT);
-
-	//Init PPM generator
-	PPM_init(config);
-
-	//Enable Arduino interrupt detection
-	attachInterrupt(4, ppmInt, RISING);
-	timeNow = 0;
-	timeOld = 0;
-	ppmIdx = 0;
 
 	//Lidar
 	g_LidarL.m_pinPWM = 21;
@@ -149,6 +147,19 @@ void deviceSetup()
 	g_ppmROLL = config.controlChannel[ROLL].ppmIdx;
 	g_ppmPITCH = config.controlChannel[PITCH].ppmIdx;
 	g_ppmTHROTTLE = config.throttleChannel.ppmIdx;
+
+	//Pin setup
+	pinMode(PPM_INPUT_PIN, INPUT);
+	pinMode(PPM_OUTPUT_PIN, OUTPUT);
+
+	//Init PPM generator
+	PPM_init(config);
+
+	//Enable Arduino interrupt detection
+	attachInterrupt(4, ppmInt, RISING);
+	timeNow = 0;
+	timeOld = 0;
+	ppmIdx = 0;
 
 
 }
@@ -209,7 +220,7 @@ void updateSwitch()
 			g_pUSBSerial->println("ALL_LIDAR_ON");
 			g_pUSBSerial->println("ALL_COLLISION_AVOID_MODE");
 #endif
-			g_opeMode = OPE_ALL_COLLISION_AVOID;
+			g_opeMode = OPE_UP_COLLISION_AVOID;// OPE_ALL_COLLISION_AVOID;
 			g_bPPMthrough = 0xff1f;
 		}
 

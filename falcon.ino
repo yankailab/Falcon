@@ -23,8 +23,9 @@ UI g_UI;
 //#include "DEVICE_SERIAL_TRANSMITTER.h"
 //#include "DEVICE_SERIAL_RECEIVER.h"
 //#include "DEVICE_RC_TRANSMITTER.h"
-#include "DEVICE_UART_RC_BRIDGE.h"
+//#include "DEVICE_UART_RC_BRIDGE.h"
 //#include "DEVICE_LIDAR_CONTROLLER.h"
+#include "DEVICE_LIDAR_LOCKER_2560.h"
 
 #include "util.h"
 
@@ -42,7 +43,6 @@ void setup()
 	{
 		setDefaultParameters();
 		EEPROM_writeAnything(0, config);
-		RFmoduleConfig();
 	}
 
 	g_pUSBSerial = &Serial;

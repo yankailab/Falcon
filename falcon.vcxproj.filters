@@ -93,6 +93,9 @@
     <ClInclude Include="DEVICE_SERIAL_TRANSMITTER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DEVICE_LIDAR_LOCKER_2560.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FSLPsensor.cpp">

@@ -9,7 +9,7 @@ config_t config;
 int g_counter = 0;
 
 //switches
-bool g_bPrintIMU = false;
+bool g_bPrintIMU = true;// false;
 bool g_bBootSuccess = true;
 bool g_bHostConnected = false;
 

@@ -2,16 +2,19 @@
 
 #include <Arduino.h>
 
-#define VERSION 19
+#define VERSION 22
 
-//#define ATMEGA_A32U4
-#define ATMEGA_A328
+#define ATMEGA_A32U4
+//#define ATMEGA_A328
 
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
 //#define SERIAL_RECEIVER
-#define UART_RC_BRIDGE
+//#define UART_RC_BRIDGE
 //#define LIDAR_CONTROLLER
+#define LIDAR_LOCKER_2560
+
+
 
 #define USB_DEBUG
 

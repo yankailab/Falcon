@@ -49,5 +49,6 @@ struct config_t
 
 	long lidarLim[4];
 	long cAvoidPWM[4];
+	int16_t PWM_THR_UP_Lim;
 };// config;
 
