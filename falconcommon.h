@@ -14,9 +14,7 @@
 //#define LIDAR_CONTROLLER
 #define LIDAR_LOCKER_2560
 
-
-
-#define USB_DEBUG
+//#define USB_DEBUG
 
 //
 // Vehicle Link
@@ -52,7 +50,7 @@
 #define OPE_PPM_THROUGH 7
 #define OPE_UP_COLLISION_AVOID 8
 #define OPE_ALL_COLLISION_AVOID 9
-#define OPE_REFERENCE_FIX 10
+#define OPE_REFERENCE_LOCK 10
 
 //
 // RC Channel
@@ -77,10 +75,12 @@
 #define SHORT_BEEP 150
 #define LONG_BEEP 500
 
+#ifdef UART_RC_BRIDGE
 #define RC_CHANNEL_NUM	8				//set the number of chanels
 #define PPM_ON_STATE	0				//set polarity of the pulses: 1 is positive, 0 is negative
-#define PPM_OUTPUT_PIN	A7				//5 for arduino pro micro,set PPM signal output pin on the arduino
+#define PPM_OUTPUT_PIN	5				//5 for arduino pro micro,set PPM signal output pin on the arduino
 #define PPM_INPUT_PIN 7
+#endif
 
 #ifdef RC_TRANSMITTER
 #define RC_CHANNEL_NUM	8				//set the number of chanels

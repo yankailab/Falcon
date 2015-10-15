@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "falconcommon.h"
+#include "variables.h"
 
 #ifdef ATMEGA_A328
 /*

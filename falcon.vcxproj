@@ -94,6 +94,7 @@
     </ClInclude>
     <ClInclude Include="IMU.h" />
     <ClInclude Include="DEVICE_LIDAR_CONTROLLER.h" />
+    <ClInclude Include="Lidar.h" />
     <ClInclude Include="LIDARLite.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -107,8 +108,8 @@
     <ClInclude Include="MPU6050_9Axis_MotionApps41.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="PPMGenerator.h" />
-    <ClInclude Include="SerialCom.h" />
+    <ClInclude Include="PPMInput.h" />
+    <ClInclude Include="PPMOutput.h" />
     <ClInclude Include="SerialCommand.h" />
     <ClInclude Include="DEVICE_SERIAL_RECEIVER.h" />
     <ClInclude Include="DEVICE_SERIAL_TRANSMITTER.h" />
@@ -120,12 +121,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="DEVICE_LIDAR_LOCKER_2560.cpp" />
     <ClCompile Include="FSLPsensor.cpp" />
     <ClCompile Include="I2Cdev.cpp" />
     <ClCompile Include="IMU.cpp" />
+    <ClCompile Include="Lidar.cpp" />
     <ClCompile Include="LIDARLite.cpp" />
     <ClCompile Include="MPU6000.cpp" />
     <ClCompile Include="MPU6050.cpp" />
+    <ClCompile Include="PPMInput.cpp" />
+    <ClCompile Include="PPMOutput.cpp" />
     <ClCompile Include="SerialCommand.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="VehicleLink.cpp" />

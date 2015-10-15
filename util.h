@@ -5,7 +5,7 @@ void RFmoduleConfig (void)
 	//	g_pSerial->println(F("AT+BAUD:8"));
 }
 
-/* */
+/* 
 void Serial_Bridge(void)
 {
 	int inByte;
@@ -24,73 +24,74 @@ void Serial_Bridge(void)
 		g_pUSBSerial->write(inByte);
 	}
 }
+*/
 
 /* */
-void setDefaultParameters()
+void setDefaultParameters(config_t* pConfig)
 {
-	config.vers = VERSION;
+	pConfig->vers = VERSION;
 
-	config.PPMframeLength = 22500;
-	config.PPMPulseLength = 500;
-	config.PWMLenFrom = 1000;
-	config.PWMLenTo = 2000;
-	config.PWMCenter = 1500;
+	pConfig->PPMframeLength = 22500;
+	pConfig->PPMPulseLength = 500;
+	pConfig->PWMLenFrom = 1000;
+	pConfig->PWMLenTo = 2000;
+	pConfig->PWMCenter = 1500;
 
-	config.controlChannel[PITCH].ppmIdx = 1;
-	config.controlChannel[PITCH].center = 1500;
-	config.controlChannel[PITCH].deadzone = 50;
-	config.controlChannel[PITCH].factor = 500;
-	config.controlChannel[PITCH].lowerLimit = -500;
-	config.controlChannel[PITCH].upperLimit = 500;
+	pConfig->controlChannel[PITCH].ppmIdx = 1;
+	pConfig->controlChannel[PITCH].center = 1500;
+	pConfig->controlChannel[PITCH].deadzone = 50;
+	pConfig->controlChannel[PITCH].factor = 500;
+	pConfig->controlChannel[PITCH].lowerLimit = -500;
+	pConfig->controlChannel[PITCH].upperLimit = 500;
 
-	config.controlChannel[ROLL].ppmIdx = 0;
-	config.controlChannel[ROLL].center = 1500;
-	config.controlChannel[ROLL].deadzone = 50;
-	config.controlChannel[ROLL].factor = -500;
-	config.controlChannel[ROLL].lowerLimit = -500;
-	config.controlChannel[ROLL].upperLimit = 500;
+	pConfig->controlChannel[ROLL].ppmIdx = 0;
+	pConfig->controlChannel[ROLL].center = 1500;
+	pConfig->controlChannel[ROLL].deadzone = 50;
+	pConfig->controlChannel[ROLL].factor = -500;
+	pConfig->controlChannel[ROLL].lowerLimit = -500;
+	pConfig->controlChannel[ROLL].upperLimit = 500;
 
-/*	config.controlChannel[YAW].ppmIdx = 3;
-	config.controlChannel[YAW].center = 1500;
-	config.controlChannel[YAW].deadzone = 50;
-	config.controlChannel[YAW].factor = -500;
-	config.controlChannel[YAW].lowerLimit = -500;
-	config.controlChannel[YAW].upperLimit = 500;
+/*	pConfig->controlChannel[YAW].ppmIdx = 3;
+	pConfig->controlChannel[YAW].center = 1500;
+	pConfig->controlChannel[YAW].deadzone = 50;
+	pConfig->controlChannel[YAW].factor = -500;
+	pConfig->controlChannel[YAW].lowerLimit = -500;
+	pConfig->controlChannel[YAW].upperLimit = 500;
 */
-	config.yawChannel.ppmIdx = 3;
-	config.yawChannel.touchThreshold = 5;
-	config.yawChannel.modeChangeThreshold = 50;
-	config.yawChannel.deadzone = 1;
-	config.yawChannel.factor = -1;
-//	config.yawChannel.lowerLimit = -10;
-//	config.yawChannel.upperLimit = 10;
-	config.yawChannel.lowerLength = 350;
-	config.yawChannel.upperLength = 650;
+	pConfig->yawChannel.ppmIdx = 3;
+	pConfig->yawChannel.touchThreshold = 5;
+	pConfig->yawChannel.modeChangeThreshold = 50;
+	pConfig->yawChannel.deadzone = 1;
+	pConfig->yawChannel.factor = -1;
+//	pConfig->yawChannel.lowerLimit = -10;
+//	pConfig->yawChannel.upperLimit = 10;
+	pConfig->yawChannel.lowerLength = 350;
+	pConfig->yawChannel.upperLength = 650;
 
-	config.throttleChannel.ppmIdx = 2;
-	config.throttleChannel.touchThreshold = 5;
-	config.throttleChannel.modeChangeThreshold = 50;
-	config.throttleChannel.deadzone = 1;
-	config.throttleChannel.factor = -1;
-	config.throttleChannel.lowerLength = 350;
-	config.throttleChannel.upperLength = 650;
+	pConfig->throttleChannel.ppmIdx = 2;
+	pConfig->throttleChannel.touchThreshold = 5;
+	pConfig->throttleChannel.modeChangeThreshold = 50;
+	pConfig->throttleChannel.deadzone = 1;
+	pConfig->throttleChannel.factor = -1;
+	pConfig->throttleChannel.lowerLength = 350;
+	pConfig->throttleChannel.upperLength = 650;
 
-	config.buttonChannel[0].ppmIdx = 4;
-	config.buttonChannel[0].modePPM[0] = 1165;
-	config.buttonChannel[0].modePPM[1] = 1295;
-	config.buttonChannel[0].modePPM[2] = 1425;
-	config.buttonChannel[0].modePPM[3] = 1555;
-	config.buttonChannel[0].modePPM[4] = 1685;
-	config.buttonChannel[0].modePPM[5] = 1815;
+	pConfig->buttonChannel[0].ppmIdx = 4;
+	pConfig->buttonChannel[0].modePPM[0] = 1165;
+	pConfig->buttonChannel[0].modePPM[1] = 1295;
+	pConfig->buttonChannel[0].modePPM[2] = 1425;
+	pConfig->buttonChannel[0].modePPM[3] = 1555;
+	pConfig->buttonChannel[0].modePPM[4] = 1685;
+	pConfig->buttonChannel[0].modePPM[5] = 1815;
 
-	config.thresholdBTN = 1;
+	pConfig->thresholdBTN = 1;
 
-	config.lidarLim[config.controlChannel[ROLL].ppmIdx] = 0;
-	config.lidarLim[config.controlChannel[PITCH].ppmIdx] = 0;
-	config.lidarLim[config.throttleChannel.ppmIdx] = 0;
+	pConfig->lidarLim[pConfig->controlChannel[ROLL].ppmIdx] = 0;
+	pConfig->lidarLim[pConfig->controlChannel[PITCH].ppmIdx] = 0;
+	pConfig->lidarLim[pConfig->throttleChannel.ppmIdx] = 0;
 
-	config.cAvoidPWM[config.controlChannel[ROLL].ppmIdx] = 100;
-	config.cAvoidPWM[config.controlChannel[PITCH].ppmIdx] = 100;
-	config.cAvoidPWM[config.throttleChannel.ppmIdx] = 60;
-	config.PWM_THR_UP_Lim = 1580;
+	pConfig->cAvoidPWM[pConfig->controlChannel[ROLL].ppmIdx] = 100;
+	pConfig->cAvoidPWM[pConfig->controlChannel[PITCH].ppmIdx] = 100;
+	pConfig->cAvoidPWM[pConfig->throttleChannel.ppmIdx] = 60;
+	pConfig->PWM_THR_UP_Lim = 1580;
 }

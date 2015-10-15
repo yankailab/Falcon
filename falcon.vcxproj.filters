@@ -24,9 +24,6 @@
     <ClInclude Include="variables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SerialCom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FSLPsensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -52,9 +49,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="helper_3dmath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PPMGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util.h">
@@ -99,6 +93,15 @@
     <ClInclude Include="LIDARLite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PPMOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PPMInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lidar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FSLPsensor.cpp">
@@ -129,6 +132,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LIDARLite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PPMOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PPMInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lidar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DEVICE_LIDAR_LOCKER_2560.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
