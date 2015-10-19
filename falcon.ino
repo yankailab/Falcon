@@ -76,7 +76,7 @@ void setup()
 	PPM_init(g_config);
 
 	g_Device.m_PPMInput.m_pPPMOut = g_ppm;
-	attachInterrupt(0, ppmInt, RISING);
+	attachInterrupt(PPM_INPUT_INT, ppmInt, RISING);
 	//2,3 for I2C, 4 or 5 for GPS port, this is the Arduino INT, not the Atmega2560 INT!
 
 

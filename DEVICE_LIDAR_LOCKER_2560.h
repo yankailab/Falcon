@@ -5,15 +5,15 @@
 #include "LIDARLite.h"
 #include "VehicleLink.h"
 
-#define RC_CHANNEL_NUM	8				//set the number of chanels
-#define PPM_ON_STATE	0				//set polarity of the pulses: 1 is positive, 0 is negative
-#define PPM_OUTPUT_PIN	A7				//5 for arduino pro micro,set PPM signal output pin on the arduino
-#define PPM_INPUT_PIN 7
+
 
 struct LIDAR_UNIT
 {
 	long m_distCM;
 	long m_lockCM;
+	long m_prevErr;
+	long m_integErr;
+
 	unsigned char m_address;
 	uint8_t	m_pinEN;
 
@@ -29,6 +29,7 @@ public:
 	void deviceSetup(config_t* pConfig);
 	void deviceLoop();
 
+	void referenceLock();
 	void collisionAvoid();
 
 public:
@@ -36,16 +37,20 @@ public:
 	HardwareSerial* m_pUSBSerial;
 
 	IMU m_IMU;
+	PPMInput m_PPMInput;
+
 	LIDARLite m_LidarLite;
 	LIDAR_UNIT m_pLidar[6];
-	PPMInput m_PPMInput;
+	LIDAR_UNIT* m_pLidarUP;
+	LIDAR_UNIT* m_pLidarL;
+	LIDAR_UNIT* m_pLidarR;
 
 	//Common classes
 	VehicleLink m_VLink;
 	config_t* m_pConfig;
 
 	//Program
-	int m_counter = 0;
+	int m_counter;
 
 	//switches
 	bool m_bPrintIMU;

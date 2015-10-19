@@ -8,8 +8,8 @@ void PPMInput::init(config_t* pConfig)
 
 	//PPM input/output
 	m_bPPMthrough = 0xffff; //through mode for all channels, 00011111
-	m_pPPMSwitch = &m_inputPPM[7];
-	m_inputPPMSwitch = 0;
+	m_pModeSwitch = &m_inputPPM[PPM_CHANNEL_MODE];
+	m_prevModeSwitch = 0;
 
 	m_ppmROLL = pConfig->controlChannel[ROLL].ppmIdx;
 	m_ppmPITCH = pConfig->controlChannel[PITCH].ppmIdx;
@@ -51,70 +51,57 @@ void PPMInput::ppmInt()
 	}
 }
 
-void PPMInput::updateSwitch()
+uint8_t PPMInput::updateSwitch()
 {
-	/*
+	uint8_t newMode;
+
+	newMode = 0;
+
 	//Update main switch status
-	if (*m_pPPMSwitch < SWITCH_LOW)
+	if (*m_pModeSwitch < SWITCH_LOW)
 	{
-		if (m_inputPPMSwitch >= SWITCH_LOW)
+		if (m_prevModeSwitch >= SWITCH_LOW)
 		{
 			//All Lidars OFF
-			digitalWrite(g_LidarUP.m_pinTrigger, LOW);
-			digitalWrite(g_LidarL.m_pinTrigger, LOW);
-			digitalWrite(g_LidarR.m_pinTrigger, LOW);
-			//			digitalWrite(g_LidarDOWN.m_pinTrigger, LOW);
-
-			g_opeMode = OPE_PPM_THROUGH;
-			g_bPPMthrough = 0xffff;
+			newMode = OPE_PPM_THROUGH;
+			m_bPPMthrough = 0xffff;
 
 #ifdef USB_DEBUG
-			g_pUSBSerial->println("ALL_LIDARS_OFF");
 			g_pUSBSerial->println("PASS_THROUGHT_MODE");
 #endif
 		}
 
 	}
-	else if (*g_pPPMSwitch < SWITCH_MID)
+	else if (*m_pModeSwitch < SWITCH_MID)
 	{
-		if (g_inputPPMSwitch <= SWITCH_LOW || g_inputPPMSwitch > SWITCH_MID)
+		if (m_prevModeSwitch <= SWITCH_LOW || m_prevModeSwitch > SWITCH_MID)
 		{
-			//UP Lidars ON
-			digitalWrite(g_LidarUP.m_pinTrigger, HIGH);
-			digitalWrite(g_LidarL.m_pinTrigger, LOW);
-			digitalWrite(g_LidarR.m_pinTrigger, LOW);
-			//			digitalWrite(g_LidarDOWN.m_pinTrigger, HIGH);
-
-			g_opeMode = OPE_UP_COLLISION_AVOID;
-			g_bPPMthrough = 0xff1f;
+			newMode = OPE_ALL_COLLISION_AVOID;
+			m_bPPMthrough = 0xff1f;
 
 #ifdef USB_DEBUG
-			g_pUSBSerial->println("UP_LIDAR_ON");
-			g_pUSBSerial->println("UP_COLLISION_AVOID_MODE");
+			g_pUSBSerial->println("ALL_COLLISION_AVOID_MODE");
 #endif
 		}
 
 	}
 	else
 	{
-		if (g_inputPPMSwitch <= SWITCH_MID)
+		if (m_prevModeSwitch <= SWITCH_MID)
 		{
-			//All Lidars ON
-			digitalWrite(g_LidarUP.m_pinTrigger, HIGH);
-			digitalWrite(g_LidarL.m_pinTrigger, HIGH);
-			digitalWrite(g_LidarR.m_pinTrigger, HIGH);
+			newMode = OPE_REFERENCE_LOCK;
+			m_bPPMthrough = 0xff1f;
 
 #ifdef USB_DEBUG
-			g_pUSBSerial->println("ALL_LIDAR_ON");
-			g_pUSBSerial->println("ALL_COLLISION_AVOID_MODE");
+			g_pUSBSerial->println("REFERENCE_LOCK_MODE");
 #endif
-			g_opeMode = OPE_UP_COLLISION_AVOID;// OPE_ALL_COLLISION_AVOID;
-			g_bPPMthrough = 0xff1f;
 		}
 
 	}
-	g_inputPPMSwitch = *g_pPPMSwitch;
 
-	*/
+	m_prevModeSwitch = *m_pModeSwitch;
+	return newMode;
+
+	
 }
 

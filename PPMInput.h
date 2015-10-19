@@ -5,7 +5,15 @@
 #define SWITCH_LOW 1250
 #define SWITCH_MID 1650
 
+/*
+Channel 6: Up distance
+Channel 7: Left/Right distance
+*/
+#define PPM_CHANNEL_MODE 7
 
+#define PWM_CENTER 1500
+#define PWM_LOW 1250
+#define PWM_HIGH 1750
 
 
 class PPMInput
@@ -13,7 +21,7 @@ class PPMInput
 public:
 	void init(config_t* pConfig);
 	void ppmInt();
-	void updateSwitch();
+	uint8_t updateSwitch();
 
 	volatile uint8_t m_val;
 	volatile unsigned long m_timeNow;
@@ -22,13 +30,10 @@ public:
 	volatile unsigned int m_pulseLength;
 
 	//Switches
-	/*
-	Channel 6: Up distance
-	Channel 7: Left/Right distance
-	*/
-	uint16_t m_inputPPMSwitch;
+
+	uint16_t m_prevModeSwitch;
 	uint16_t m_inputPPM[RC_CHANNEL_NUM];
-	uint16_t* m_pPPMSwitch;
+	uint16_t* m_pModeSwitch;
 
 	uint8_t m_ppmROLL;
 	uint8_t m_ppmPITCH;
