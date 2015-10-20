@@ -1,4 +1,6 @@
 
+int sign(double x) { return (x>0) - (x<0); }
+
 void RFmoduleConfig (void)
 {
 	//	g_pSerial->print(F("AT+NAME:FALCON"));
@@ -26,7 +28,7 @@ void Serial_Bridge(void)
 }
 */
 
-/* */
+/*
 void setDefaultParameters(config_t* pConfig)
 {
 	pConfig->vers = VERSION;
@@ -51,13 +53,13 @@ void setDefaultParameters(config_t* pConfig)
 	pConfig->controlChannel[ROLL].lowerLimit = -500;
 	pConfig->controlChannel[ROLL].upperLimit = 500;
 
-/*	pConfig->controlChannel[YAW].ppmIdx = 3;
-	pConfig->controlChannel[YAW].center = 1500;
-	pConfig->controlChannel[YAW].deadzone = 50;
-	pConfig->controlChannel[YAW].factor = -500;
-	pConfig->controlChannel[YAW].lowerLimit = -500;
-	pConfig->controlChannel[YAW].upperLimit = 500;
-*/
+//	pConfig->controlChannel[YAW].ppmIdx = 3;
+//	pConfig->controlChannel[YAW].center = 1500;
+//	pConfig->controlChannel[YAW].deadzone = 50;
+//	pConfig->controlChannel[YAW].factor = -500;
+//	pConfig->controlChannel[YAW].lowerLimit = -500;
+//	pConfig->controlChannel[YAW].upperLimit = 500;
+
 	pConfig->yawChannel.ppmIdx = 3;
 	pConfig->yawChannel.touchThreshold = 5;
 	pConfig->yawChannel.modeChangeThreshold = 50;
@@ -95,3 +97,4 @@ void setDefaultParameters(config_t* pConfig)
 	pConfig->cAvoidPWM[pConfig->throttleChannel.ppmIdx] = 60;
 	pConfig->PWM_THR_UP_Lim = 1580;
 }
+*/

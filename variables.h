@@ -30,6 +30,14 @@ struct Switch_Channel
 	uint16_t modePPM[6];
 };
 
+struct Lidar_Setting
+{
+	long m_P;
+	long m_I;
+	long m_Imax;
+	long m_D;
+};
+
 struct config_t
 {
 	uint8_t vers;
@@ -50,5 +58,7 @@ struct config_t
 	long lidarLim[4];
 	long cAvoidPWM[4];
 	int16_t PWM_THR_UP_Lim;
-};// config;
+
+	Lidar_Setting lidar[3];
+};
 

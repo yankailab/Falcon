@@ -15,7 +15,6 @@ UI g_UI;
 //	COMMON INCLUDES
 #include "EEPROMAnything.h"
 #include "PPMOutput.h"
-#include "util.h"
 
 //#include "DEVICE_COMMON.h"
 //#include "DEVICE_SERIAL_TRANSMITTER.h"
@@ -26,12 +25,11 @@ UI g_UI;
 #include "DEVICE_LIDAR_LOCKER_2560.h"
 DEVICE_LIDAR_LOCKER_2560 g_Device;
 
-config_t g_config;
-
 //
 //IMU
 //
-volatile bool mpuInterrupt = false; //indicates whether MPU interrupt pin has gone high
+//indicates whether MPU interrupt pin has gone high
+volatile bool mpuInterrupt = false;
 void dmpDataReady()
 {
 	//mpuInterrupt=true;
@@ -54,12 +52,12 @@ void setup()
 	// Read Config or fill with default settings
 	if (EEPROM.read(0) == VERSION)
 	{
-		EEPROM_readAnything(0, g_config);
+		EEPROM_readAnything(0, g_Device.m_config);
 	}
 	else
 	{
-		setDefaultParameters(&g_config);
-		EEPROM_writeAnything(0, g_config);
+		g_Device.setDefaultParameters();
+		EEPROM_writeAnything(0, g_Device.m_config);
 	}
 
 	g_Device.m_pUSBSerial = &Serial;
@@ -67,22 +65,18 @@ void setup()
 	g_Device.m_pRFSerial = &Serial1;
 #endif
 	
-	g_Device.deviceSetup(&g_config);
+	g_Device.deviceSetup();
 
 	// enable Arduino interrupt detection
 	attachInterrupt(6, dmpDataReady, RISING);
 
 	//Init PPM output
-	PPM_init(g_config);
-
+	PPM_init(g_Device.m_config.PPMframeLength, g_Device.m_config.PPMPulseLength);
 	g_Device.m_PPMInput.m_pPPMOut = g_ppm;
 	attachInterrupt(PPM_INPUT_INT, ppmInt, RISING);
 	//2,3 for I2C, 4 or 5 for GPS port, this is the Arduino INT, not the Atmega2560 INT!
 
-
-
 }
-
 
 //
 //MAIN PROGRAM LOOP
@@ -91,4 +85,3 @@ void loop()
 {
 	g_Device.deviceLoop();
 }
-

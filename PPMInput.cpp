@@ -1,6 +1,6 @@
 #include "PPMInput.h"
 
-void PPMInput::init(config_t* pConfig)
+void PPMInput::init(void)
 {
 	m_timeNow = 0;
 	m_timeOld = 0;
@@ -10,10 +10,6 @@ void PPMInput::init(config_t* pConfig)
 	m_bPPMthrough = 0xffff; //through mode for all channels, 00011111
 	m_pModeSwitch = &m_inputPPM[PPM_CHANNEL_MODE];
 	m_prevModeSwitch = 0;
-
-	m_ppmROLL = pConfig->controlChannel[ROLL].ppmIdx;
-	m_ppmPITCH = pConfig->controlChannel[PITCH].ppmIdx;
-	m_ppmTHROTTLE = pConfig->throttleChannel.ppmIdx;
 }
 
 
@@ -51,11 +47,11 @@ void PPMInput::ppmInt()
 	}
 }
 
-uint8_t PPMInput::updateSwitch()
+uint8_t PPMInput::updateModeSwitch(uint8_t currentMode)
 {
 	uint8_t newMode;
 
-	newMode = 0;
+	newMode = currentMode;
 
 	//Update main switch status
 	if (*m_pModeSwitch < SWITCH_LOW)

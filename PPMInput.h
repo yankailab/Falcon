@@ -1,6 +1,5 @@
 #pragma once
 #include "falconcommon.h"
-#include "variables.h"
 
 #define SWITCH_LOW 1250
 #define SWITCH_MID 1650
@@ -11,17 +10,12 @@ Channel 7: Left/Right distance
 */
 #define PPM_CHANNEL_MODE 7
 
-#define PWM_CENTER 1500
-#define PWM_LOW 1250
-#define PWM_HIGH 1750
-
-
 class PPMInput
 {
 public:
-	void init(config_t* pConfig);
+	void init(void);
 	void ppmInt();
-	uint8_t updateSwitch();
+	uint8_t updateModeSwitch(uint8_t currentMode);
 
 	volatile uint8_t m_val;
 	volatile unsigned long m_timeNow;

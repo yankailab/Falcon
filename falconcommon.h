@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 22
+#define VERSION 26
 
 #define ATMEGA_A32U4
 //#define ATMEGA_A328
@@ -108,7 +108,6 @@
 #define SETBIT_ON(x,y) (x|=(1<<y))
 #define SETBIT_OFF(x,y) (x&=(~(1<<y)))
 #define BIT_ON(x,y) (x&(1<<y))
-
 
 
 

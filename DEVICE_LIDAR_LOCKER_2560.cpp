@@ -1,53 +1,35 @@
 #include "DEVICE_LIDAR_LOCKER_2560.h"
 
-
 void DEVICE_LIDAR_LOCKER_2560::referenceLock()
 {
 	long err, pwm;
 
 	// UP direction
 	err = m_pLidarUP->m_lockCM - m_pLidarUP->m_distCM;
-	m_pLidarUP->m_integErr += err;
-	pwm = PWM_CENTER +
-		m_pLidarUP->m_P * err
-		+ m_pLidarUP->m_D * (err - m_pLidarUP->m_prevErr)
-		+ constrain(m_pLidarUP->m_I * m_pLidarUP->m_integErr, m_Imax, -m_Imax);
-	constrain(pwm, PWM_LOW, PWM_HIGH);
+	m_pLidarUP->m_integErr = constrain(m_pLidarUP->m_integErr + err, -m_config.m_errLim, m_config.m_errLim);
+	pwm = m_config.PWMCenter +
+		m_pLidarUP->m_setting.m_P * err
+		+ m_pLidarUP->m_setting.m_D * (err - m_pLidarUP->m_prevErr)
+		+ constrain(m_pLidarUP->m_setting.m_I * m_pLidarUP->m_integErr, 
+					-m_pLidarUP->m_setting.m_Imax,
+					m_pLidarUP->m_setting.m_Imax);
+	pwm = constrain(pwm, m_config.PWMLenFrom, m_config.PWMLenTo);
 	m_pLidarUP->m_prevErr = err;
-
 	m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmTHROTTLE] = pwm;
+	
+	// Roll Axis
+	err = m_pLidarRoll->m_lockCM - m_pLidarRoll->m_distCM;
+	m_pLidarRoll->m_integErr = constrain(m_pLidarRoll->m_integErr + err, -m_config.m_errLim, m_config.m_errLim);
+	pwm = m_config.PWMCenter +
+		m_pLidarRoll->m_setting.m_P * err
+		+ m_pLidarRoll->m_setting.m_D * (err - m_pLidarRoll->m_prevErr)
+		+ constrain(m_pLidarRoll->m_setting.m_I * m_pLidarRoll->m_integErr,
+					-m_pLidarRoll->m_setting.m_Imax,
+					m_pLidarRoll->m_setting.m_Imax);
+	pwm = constrain(pwm, m_config.PWMLenFrom, m_config.PWMLenTo);
+	m_pLidarRoll->m_prevErr = err;
+	m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = pwm;
 
-
-	//Roll Axis
-	distL = m_pLidarL->m_distCM - m_pConfig->lidarLim[m_PPMInput.m_ppmROLL];
-	distR = m_pLidarR->m_distCM - m_pConfig->lidarLim[m_PPMInput.m_ppmROLL];
-
-	if (distL < 0 && distR < 0)
-	{
-		if (distL < distR)
-		{
-			distR = 0;
-		}
-		else
-		{
-			distL = 0;
-		}
-	}
-
-	if (distL < 0)
-	{
-		SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = 1500 + m_pConfig->cAvoidPWM[m_PPMInput.m_ppmROLL];
-	}
-	else if (distR < 0)
-	{
-		SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = 1500 - m_pConfig->cAvoidPWM[m_PPMInput.m_ppmROLL];
-	}
-	else
-	{
-		SETBIT_ON(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-	}
 }
 
 void DEVICE_LIDAR_LOCKER_2560::collisionAvoid()
@@ -55,11 +37,11 @@ void DEVICE_LIDAR_LOCKER_2560::collisionAvoid()
 	long distL, distR, distUP;
 	
 	// UP direction
-	distUP = m_pLidarUP->m_distCM - m_pConfig->lidarLim[m_PPMInput.m_ppmTHROTTLE];
+	distUP = m_pLidarUP->m_distCM - m_config.lidarLim[m_PPMInput.m_ppmTHROTTLE];
 	if (distUP < 0)
 	{
 		SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmTHROTTLE);
-		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmTHROTTLE] = 1500 - m_pConfig->cAvoidPWM[m_PPMInput.m_ppmTHROTTLE];
+		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmTHROTTLE] = 1500 - m_config.cAvoidPWM[m_PPMInput.m_ppmTHROTTLE];
 	}
 	else
 	{
@@ -67,8 +49,8 @@ void DEVICE_LIDAR_LOCKER_2560::collisionAvoid()
 	}
 
 	//Roll Axis
-	distL = m_pLidarL->m_distCM - m_pConfig->lidarLim[m_PPMInput.m_ppmROLL];
-	distR = m_pLidarR->m_distCM - m_pConfig->lidarLim[m_PPMInput.m_ppmROLL];
+	distL = m_pLidarL->m_distCM - m_config.lidarLim[m_PPMInput.m_ppmROLL];
+	distR = m_pLidarR->m_distCM - m_config.lidarLim[m_PPMInput.m_ppmROLL];
 
 	if (distL < 0 && distR < 0)
 	{
@@ -85,12 +67,12 @@ void DEVICE_LIDAR_LOCKER_2560::collisionAvoid()
 	if (distL < 0)
 	{
 		SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = 1500 + m_pConfig->cAvoidPWM[m_PPMInput.m_ppmROLL];
+		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = m_config.PWMCenter + m_config.cAvoidPWM[m_PPMInput.m_ppmROLL];
 	}
 	else if (distR < 0)
 	{
 		SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = 1500 - m_pConfig->cAvoidPWM[m_PPMInput.m_ppmROLL];
+		m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL] = m_config.PWMCenter - m_config.cAvoidPWM[m_PPMInput.m_ppmROLL];
 	}
 	else
 	{
@@ -100,15 +82,13 @@ void DEVICE_LIDAR_LOCKER_2560::collisionAvoid()
 }
 
 
-
-void DEVICE_LIDAR_LOCKER_2560::deviceSetup(config_t* pConfig)
+void DEVICE_LIDAR_LOCKER_2560::deviceSetup(void)
 {
 	uint8_t i;
 
-	m_bPrintIMU = true;// false;
+	m_bPrintOut = true;// false;
 	m_bBootSuccess = true;
 	m_bHostConnected = false;
-	m_pConfig = pConfig;
 	m_counter = 0;
 
 #ifdef USB_DEBUG
@@ -143,14 +123,17 @@ void DEVICE_LIDAR_LOCKER_2560::deviceSetup(config_t* pConfig)
 	//LidarLite Setup
 	// Array of pins connected to the sensor Power Enable lines
 	int lidarPins[] = { A0, A1, A2 };
-	unsigned char lidarAddresses[] = { 0x66, 0x68, 0x64 };
+	unsigned char lidarAddresses[] = { 0x66, 0x64, 0x68 };
 
 	m_LidarLite.begin();
 	m_LidarLite.changeAddressMultiPwrEn(3, lidarPins, lidarAddresses, false);
 	for (i = 0; i < 3; i++)
 	{
-		m_pLidar[i].m_address = lidarAddresses[i];
-		m_pLidar[i].m_pinEN = lidarPins[i];
+		m_pLidar[i].m_setting.m_address = lidarAddresses[i];
+		m_pLidar[i].m_setting.m_pinEN = lidarPins[i];
+		m_pLidar[i].m_distCM = 0;
+		m_pLidar[i].m_diverge = 0;
+
 		pinMode(lidarPins[i], OUTPUT);
 	}
 
@@ -159,21 +142,26 @@ void DEVICE_LIDAR_LOCKER_2560::deviceSetup(config_t* pConfig)
 	m_pLidarR = &m_pLidar[2];
 	
 	//Init PPM input
-	m_PPMInput.init(pConfig);
+	m_PPMInput.init();
+	m_PPMInput.m_ppmROLL = m_config.m_ppmIdxRoll;
+	m_PPMInput.m_ppmPITCH = m_config.m_ppmIdxPitch;
+	m_PPMInput.m_ppmTHROTTLE = m_config.m_ppmIdxThrottle;
 
 	//Init system mode
-	m_opeMode = OPE_PPM_THROUGH;
+	m_opeMode = OPE_REFERENCE_LOCK;// OPE_PPM_THROUGH;
 
 	m_pUSBSerial->println(F("FALCON_START"));
 
 }
 
 
-
 void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 {
 	int i;
 	uint8_t opeMode;
+	float cosRoll, cosPitch;
+	float dist;
+	long stickInput;
 
 	if (!m_bBootSuccess)
 	{
@@ -189,53 +177,41 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 		m_IMU.update();
 	}
 
+	//m_IMU.m_ypr[0]; pitch [2]front is -, roll [1] left is +
+	cosRoll = abs(cos(m_IMU.m_ypr[1]));
+	cosPitch = abs(cos(m_IMU.m_ypr[2]));
+
 	//Update Lidars
-	for (i = 0; i < 3; i++)
-	{
-		//m_IMU.m_ypr[0];
-		//TODO: detect Lidar Failure
-		//TODO: add Filter, calculate using gyro
-		m_pLidar[i].m_distCM = m_LidarLite.distance(true, true, m_pLidar[i].m_address);
-		//Update Attitude, TODO: change to using IMU
-		//		g_attitude[PITCH] = cos(abs(g_ppm[config.controlChannel[PITCH].ppmIdx] - 1500)*0.002);
-		//		g_attitude[ROLL] = cos(abs(g_ppm[config.controlChannel[ROLL].ppmIdx] - 1500)*0.002);
-		//pLidarL->m_distCM *= g_attitude[ROLL];
-		//pLidarR->m_distCM *= g_attitude[ROLL];
-		//		pLidarUP->m_distCM *= g_attitude[PITCH];
-	}
+	dist = cosRoll * cosPitch * ((float)m_LidarLite.distance(true, true, m_pLidarUP->m_setting.m_address));
+	m_pLidarUP->m_distCM = (dist + (float)m_pLidarUP->m_distCM) * 0.5;
+	m_pLidarUP->m_diverge = (m_pLidarUP->m_diverge + abs(dist - m_pLidarUP->m_distCM))*0.5;
 
-	//Update controller setting input
-	//*0.001*4000 ,up to 40m
-	m_pConfig->lidarLim[m_PPMInput.m_ppmTHROTTLE] = abs(m_PPMInput.m_inputPPM[5] - 1000) * 1;
-	m_pConfig->lidarLim[m_PPMInput.m_ppmROLL] = abs(m_PPMInput.m_inputPPM[6] - 1000) * 1;
+	dist = cosRoll * ((float)m_LidarLite.distance(true, true, m_pLidarL->m_setting.m_address));
+	m_pLidarL->m_distCM = (dist + (float)m_pLidarL->m_distCM) * 0.5;
+	m_pLidarL->m_diverge = (m_pLidarL->m_diverge + abs(dist - m_pLidarL->m_distCM))*0.5;
 
-	//Update control mode
-	opeMode = m_PPMInput.updateSwitch();
-	if (opeMode != m_opeMode)
-	{
-		//Mode is changed, init the reference lock distance
-		if (opeMode == OPE_REFERENCE_LOCK)
-		{
-			for (i = 0; i < 3; i++)
-			{
-				m_pLidar[i].m_lockCM = m_pLidar[i].m_distCM;
-			}
+	dist = cosRoll * ((float)m_LidarLite.distance(true, true, m_pLidarR->m_setting.m_address));
+	m_pLidarR->m_distCM = (dist + (float)m_pLidarR->m_distCM) * 0.5;
+	m_pLidarR->m_diverge = (m_pLidarR->m_diverge + abs(dist - m_pLidarR->m_distCM))*0.5;
 
-			SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmTHROTTLE);
-			SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		}
-		else
-		{
-			SETBIT_ON(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmTHROTTLE);
-			SETBIT_ON(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
-		}
-
-		m_opeMode = opeMode;
-	}
+	//TODO: reset diverge when distance is infinite
+	//TODO: detect Lidar Failure
 
 	//Main controller
 	if (m_opeMode == OPE_REFERENCE_LOCK)
 	{
+		decideRollLidar();
+
+		//Stick input
+/*		stickInput = m_PPMInput.m_inputPPM[m_PPMInput.m_ppmROLL] - m_config.PWMCenter;
+		if (abs(stickInput) > m_config.m_deadZone)
+		{
+			stickInput = (stickInput > 0) ? 1 : -1;
+			m_pLidarRoll->m_lockCM = constrain(m_pLidarRoll->m_lockCM + m_config.m_rollDSpeed*stickInput,
+												m_config.m_lidarRangeMin,
+												m_config.m_lidarRangeMax);
+		}
+		*/
 		referenceLock();
 	}
 	else if (m_opeMode == OPE_ALL_COLLISION_AVOID)
@@ -243,28 +219,147 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 		collisionAvoid();
 	}
 
-
 	//Slow rate actions
 	switch (m_counter)
 	{
+	case 0:
+		//Update controller setting input
+		//*0.001*4000 ,up to 40m
+		m_config.lidarLim[m_PPMInput.m_ppmTHROTTLE] = abs(m_PPMInput.m_inputPPM[5] - 1000) * 1;
+		m_config.lidarLim[m_PPMInput.m_ppmROLL] = abs(m_PPMInput.m_inputPPM[6] - 1000) * 1;
+		break;
+
 	case 1:
-		if (m_bPrintIMU)
+		//Update control mode
+		opeMode = m_PPMInput.updateModeSwitch(m_opeMode);
+		if (opeMode != m_opeMode)
 		{
-			m_pUSBSerial->print("Sensor 0x66: ");
-			m_pUSBSerial->print(m_pLidar[0].m_distCM);
-			m_pUSBSerial->print(", Sensor 0x68: ");
-			m_pUSBSerial->print(m_pLidar[1].m_distCM);
-			m_pUSBSerial->print(", Sensor 0x64: ");
-			m_pUSBSerial->print(m_pLidar[2].m_distCM);
+			//Mode is changed, init the reference lock distance
+			if (opeMode == OPE_REFERENCE_LOCK)
+			{
+				for (i = 0; i < 3; i++)
+				{
+					m_pLidar[i].m_lockCM = m_pLidar[i].m_distCM;
+					m_pLidar[i].m_integErr = 0;
+					m_pLidar[i].m_prevErr = 0;
+				}
 
-			m_pUSBSerial->print("   ypr\t");
-			m_pUSBSerial->print(m_IMU.m_ypr[0]);
-			m_pUSBSerial->print("\t");
-			m_pUSBSerial->print(m_IMU.m_ypr[1]);
-			m_pUSBSerial->print("\t");
+				//Decide using L or R
+				decideRollLidar();
+
+				SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmTHROTTLE);
+				SETBIT_OFF(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
+			}
+			else
+			{
+				SETBIT_ON(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmTHROTTLE);
+				SETBIT_ON(m_PPMInput.m_bPPMthrough, m_PPMInput.m_ppmROLL);
+			}
+
+			m_opeMode = opeMode;
+		}
+		break;
+
+	case 2:
+		serialPrint();
+		break;
+
+	default:
+		m_counter = 0;
+		break;
+	}
+//TODO:	m_counter++;
+	m_counter=2;
+
+}
+
+void DEVICE_LIDAR_LOCKER_2560::decideRollLidar()
+{
+	m_pLidarRoll = m_pLidarL;
+	/*	
+	if (m_pLidarL->m_distCM < m_config.m_lidarRangeLim)
+	{
+		m_pLidarRoll = m_pLidarL;
+	}
+	else
+	{
+		m_pLidarRoll = m_pLidarR;
+	}
+	*/
+}
+
+void DEVICE_LIDAR_LOCKER_2560::setDefaultParameters(void)
+{
+	m_config.vers = VERSION;
+
+	m_config.PPMframeLength = 22500;
+	m_config.PPMPulseLength = 500;
+	m_config.PWMLenFrom = 1250;
+	m_config.PWMLenTo = 1750;
+	m_config.PWMCenter = 1500;
+
+	m_config.m_ppmIdxPitch = 1;
+	m_config.m_ppmIdxRoll = 0;
+	m_config.m_ppmIdxThrottle = 2;
+	m_config.m_ppmIdxYaw = 3;
+
+	m_config.lidarLim[m_config.m_ppmIdxRoll] = 0;
+	m_config.lidarLim[m_config.m_ppmIdxPitch] = 0;
+	m_config.lidarLim[m_config.m_ppmIdxThrottle] = 0;
+
+	m_config.cAvoidPWM[m_config.m_ppmIdxRoll] = 60;
+	m_config.cAvoidPWM[m_config.m_ppmIdxPitch] = 60;
+	m_config.cAvoidPWM[m_config.m_ppmIdxThrottle] = 60;
+	m_config.PWM_THR_UP_Lim = 1580;
+
+	m_config.m_lidarRangeMin = 100;
+	m_config.m_lidarRangeMax = 3000;
+	m_config.m_rollDSpeed = 1;
+	m_config.m_altDSpeed = 1;
+	m_config.m_deadZone = 100;
+}
+
+void DEVICE_LIDAR_LOCKER_2560::serialPrint()
+{
+	if (m_bPrintOut)
+	{
+		if (m_opeMode == OPE_REFERENCE_LOCK)
+		{
+			m_pUSBSerial->print("L:");
+			m_pUSBSerial->print(m_pLidarL->m_distCM);
+			m_pUSBSerial->print("(");
+			m_pUSBSerial->print(m_pLidarL->m_diverge);
+			m_pUSBSerial->print("), UP:");
+			m_pUSBSerial->print(m_pLidarUP->m_distCM);
+			m_pUSBSerial->print("(");
+			m_pUSBSerial->print(m_pLidarUP->m_diverge);
+			m_pUSBSerial->print("), R:");
+			m_pUSBSerial->print(m_pLidarR->m_distCM);
+			m_pUSBSerial->print("(");
+			m_pUSBSerial->print(m_pLidarR->m_diverge);
+
+			m_pUSBSerial->print("), Pitch:");
 			m_pUSBSerial->print(m_IMU.m_ypr[2]);
+			m_pUSBSerial->print(", Roll:");
+			m_pUSBSerial->println(m_IMU.m_ypr[1]);
+		}
+		else if (m_opeMode == OPE_ALL_COLLISION_AVOID)
+		{
+			m_pUSBSerial->print("L:");
+			m_pUSBSerial->print(m_pLidarL->m_distCM);
+			m_pUSBSerial->print(", UP:");
+			m_pUSBSerial->print(m_pLidarUP->m_distCM);
+			m_pUSBSerial->print(", R:");
+			m_pUSBSerial->print(m_pLidarR->m_distCM);
 
-			m_pUSBSerial->print(" ");
+			m_pUSBSerial->print(", Pitch:");
+			m_pUSBSerial->print(m_IMU.m_ypr[2]);
+			m_pUSBSerial->print(", Roll:");
+			m_pUSBSerial->println(m_IMU.m_ypr[1]);
+		}
+		else //PPM through
+		{
+			m_pUSBSerial->print("PPM: ");
 			m_pUSBSerial->print(m_PPMInput.m_pPPMOut[0]);
 			m_pUSBSerial->print(" ");
 			m_pUSBSerial->print(m_PPMInput.m_pPPMOut[1]);
@@ -282,12 +377,6 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 			m_pUSBSerial->println(m_PPMInput.m_pPPMOut[7]);
 		}
 
-		m_counter = 0;
-		break;
-
-	default:
-		break;
 	}
-	m_counter++;
 
 }
