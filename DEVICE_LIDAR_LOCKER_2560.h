@@ -24,6 +24,8 @@ struct LIDAR_UNIT
 	long m_integErr;
 	long m_diverge;
 
+	bool m_bLocked;
+
 	Lidar_Setting m_setting;
 };
 
@@ -41,18 +43,22 @@ struct config_t
 	unsigned char m_ppmIdxPitch;
 	unsigned char m_ppmIdxThrottle;
 	unsigned char m_ppmIdxYaw;
+	unsigned char m_ppmIdxMode;
 
-	long lidarLim[3];
-	long cAvoidPWM[3];
+	long lidarLim[NUM_LIDAR];
+	long cAvoidPWM[NUM_LIDAR];
 	int16_t PWM_THR_UP_Lim;
 
-	Lidar_Setting lidar[3];
+	Lidar_Setting lidar[NUM_LIDAR];
 	long m_errLim;
 	long m_lidarRangeMax;
 	long m_lidarRangeMin;
 	long m_rollDSpeed; //difference in CM
 	long m_altDSpeed;
 	long m_deadZone;
+	float m_divergeFactor;
+	float m_pwmFactor;
+	long m_inputDtime;
 };
 
 
@@ -97,6 +103,11 @@ public:
 	//General
 	uint8_t m_opeMode;
 	bool m_bMpuInterrupt;
+
+	unsigned long m_timeNow;
+	unsigned long m_timePrev;
+	unsigned long m_dTime;
+
 
 };
 
