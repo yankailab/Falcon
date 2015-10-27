@@ -126,8 +126,8 @@ void DEVICE_LIDAR_LOCKER_2560::deviceSetup(void)
 
 	//LidarLite Setup
 	// Array of pins connected to the sensor Power Enable lines
-	int lidarPins[] = { A0, A1, A2 };
-	unsigned char lidarAddresses[] = { 0x66, 0x64, 0x68 };
+	int lidarPins[] = { A0, A1, A2, A3 };
+	unsigned char lidarAddresses[] = { 0x66, 0x64, 0x68, 0x70 };
 
 	m_LidarLite.begin();
 	m_LidarLite.changeAddressMultiPwrEn(NUM_LIDAR, lidarPins, lidarAddresses, false);
@@ -142,10 +142,12 @@ void DEVICE_LIDAR_LOCKER_2560::deviceSetup(void)
 		pinMode(lidarPins[i], OUTPUT);
 	}
 
-	m_pLidarUP = &m_pLidar[0];
-	m_pLidarL = &m_pLidar[1];
-	m_pLidarR = &m_pLidar[2];
-	
+	m_pLidarUP = &m_pLidar[3];
+	m_pLidarL = &m_pLidar[2];
+	m_pLidarR = &m_pLidar[1];
+	m_pLidarF = &m_pLidar[0];
+	m_pLidarB = &m_pLidar[0];
+
 	//Init PPM input
 	m_PPMInput.m_ppmROLL = m_config.m_ppmIdxRoll;
 	m_PPMInput.m_ppmPITCH = m_config.m_ppmIdxPitch;
@@ -209,6 +211,17 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 	m_pLidarR->m_diverge *= m_config.m_divergeFactor;
 	m_pLidarR->m_diverge += abs(dist - m_pLidarR->m_distCM);
 
+	dist = cosPitch * ((float)m_LidarLite.distance(true, true, m_pLidarF->m_setting.m_address));
+	m_pLidarF->m_distCM = (dist + (float)m_pLidarF->m_distCM) * 0.5;
+	m_pLidarF->m_diverge *= m_config.m_divergeFactor;
+	m_pLidarF->m_diverge += abs(dist - m_pLidarF->m_distCM);
+
+/*	dist = cosRoll * ((float)m_LidarLite.distance(true, true, m_pLidarB->m_setting.m_address));
+	m_pLidarB->m_distCM = (dist + (float)m_pLidarB->m_distCM) * 0.5;
+	m_pLidarB->m_diverge *= m_config.m_divergeFactor;
+	m_pLidarB->m_diverge += abs(dist - m_pLidarB->m_distCM);
+	*/
+
 	//TODO: reset diverge when distance is infinite
 	//TODO: detect Lidar Failure
 
@@ -250,15 +263,15 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 	//Slow rate actions
 	switch (m_counter)
 	{
-	case 0:
+	case 1:
 		//Update controller setting input
 		//*0.001*4000 ,up to 40m
 		//TODO
-		m_config.lidarLim[m_PPMInput.m_ppmTHROTTLE] = 250;// abs(m_PPMInput.m_inputPPM[5] - 1000) * 1;
-		m_config.lidarLim[m_PPMInput.m_ppmROLL] = 250;// abs(m_PPMInput.m_inputPPM[6] - 1000) * 1;
+		m_config.lidarLim[m_PPMInput.m_ppmTHROTTLE] = abs(m_PPMInput.m_inputPPM[m_config.cAvoidALT_PPMIdx] - 1000) * 1;
+		m_config.lidarLim[m_PPMInput.m_ppmROLL] = abs(m_PPMInput.m_inputPPM[m_config.cAvoidROLL_PPMIdx] - 1000) * 1;
 		break;
 
-	case 1:
+	case 2:
 		//Update control mode
 		opeMode = m_PPMInput.updateModeSwitch();
 		if (opeMode != m_opeMode)
@@ -286,7 +299,7 @@ void DEVICE_LIDAR_LOCKER_2560::deviceLoop()
 		}
 		break;
 
-	case 2:
+	case 3:
 		serialPrint();
 		break;
 
@@ -327,7 +340,7 @@ void DEVICE_LIDAR_LOCKER_2560::setDefaultParameters(void)
 	m_config.m_ppmIdxRoll = 0;
 	m_config.m_ppmIdxThrottle = 2;
 	m_config.m_ppmIdxYaw = 3;
-	m_config.m_ppmIdxMode = 1;// 7;//TODO:temporal test
+	m_config.m_ppmIdxMode = 7;
 
 	m_config.lidarLim[m_config.m_ppmIdxRoll] = 0;
 	m_config.lidarLim[m_config.m_ppmIdxPitch] = 0;
@@ -337,6 +350,8 @@ void DEVICE_LIDAR_LOCKER_2560::setDefaultParameters(void)
 	m_config.cAvoidPWM[m_config.m_ppmIdxPitch] = 60;
 	m_config.cAvoidPWM[m_config.m_ppmIdxThrottle] = 60;
 	m_config.PWM_THR_UP_Lim = 1580;
+	m_config.cAvoidALT_PPMIdx = 5;
+	m_config.cAvoidROLL_PPMIdx = 6;
 
 	m_config.m_lidarRangeMin = 100;
 	m_config.m_lidarRangeMax = 3000;
@@ -364,31 +379,37 @@ void DEVICE_LIDAR_LOCKER_2560::serialPrint()
 	{
 		if (m_opeMode == OPE_REFERENCE_LOCK)
 		{
-			m_pUSBSerial->print("[REF LOCK] L:");
-			m_pUSBSerial->print(m_pLidarL->m_distCM);
-			m_pUSBSerial->print("/");
-			m_pUSBSerial->print(m_pLidarL->m_lockCM);
-			m_pUSBSerial->print("(");
-			m_pUSBSerial->print(m_pLidarL->m_diverge);
-			m_pUSBSerial->print("),  UP:");
+			m_pUSBSerial->print("[REF LOCK] UP:");
 			m_pUSBSerial->print(m_pLidarUP->m_distCM);
 			m_pUSBSerial->print("/");
 			m_pUSBSerial->print(m_pLidarUP->m_lockCM);
 			m_pUSBSerial->print("(");
 			m_pUSBSerial->print(m_pLidarUP->m_diverge);
+			m_pUSBSerial->print("),  L:");
+			m_pUSBSerial->print(m_pLidarL->m_distCM);
+			m_pUSBSerial->print("/");
+			m_pUSBSerial->print(m_pLidarL->m_lockCM);
+			m_pUSBSerial->print("(");
+			m_pUSBSerial->print(m_pLidarL->m_diverge);
 			m_pUSBSerial->print("),  R:");
 			m_pUSBSerial->print(m_pLidarR->m_distCM);
 			m_pUSBSerial->print("/");
 			m_pUSBSerial->print(m_pLidarR->m_lockCM);
 			m_pUSBSerial->print("(");
 			m_pUSBSerial->print(m_pLidarR->m_diverge);
+			m_pUSBSerial->print("),  F:");
+			m_pUSBSerial->print(m_pLidarF->m_distCM);
+			m_pUSBSerial->print("/");
+			m_pUSBSerial->print(m_pLidarF->m_lockCM);
+			m_pUSBSerial->print("(");
+			m_pUSBSerial->print(m_pLidarF->m_diverge);
 
-			m_pUSBSerial->print("), Pitch:");
+			m_pUSBSerial->print(");  Pitch:");
 			m_pUSBSerial->print(m_IMU.m_ypr[2]);
 			m_pUSBSerial->print(", Roll:");
 			m_pUSBSerial->print(m_IMU.m_ypr[1]);
 
-			m_pUSBSerial->print("PWM: Thr:");
+			m_pUSBSerial->print(";  PWM: Thr:");
 			m_pUSBSerial->print(m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmTHROTTLE]);
 			m_pUSBSerial->print(", Roll:");
 			m_pUSBSerial->println(m_PPMInput.m_pPPMOut[m_PPMInput.m_ppmROLL]);

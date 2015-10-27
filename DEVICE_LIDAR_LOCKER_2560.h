@@ -48,6 +48,8 @@ struct config_t
 	long lidarLim[NUM_LIDAR];
 	long cAvoidPWM[NUM_LIDAR];
 	int16_t PWM_THR_UP_Lim;
+	uint8_t cAvoidALT_PPMIdx;
+	uint8_t cAvoidROLL_PPMIdx;
 
 	Lidar_Setting lidar[NUM_LIDAR];
 	long m_errLim;
@@ -82,11 +84,14 @@ public:
 	PPMInput m_PPMInput;
 
 	LIDARLite m_LidarLite;
-	LIDAR_UNIT m_pLidar[6];
+	LIDAR_UNIT m_pLidar[NUM_LIDAR];
 	LIDAR_UNIT* m_pLidarUP;
 	LIDAR_UNIT* m_pLidarL;
 	LIDAR_UNIT* m_pLidarR;
+	LIDAR_UNIT* m_pLidarF;
+	LIDAR_UNIT* m_pLidarB;
 	LIDAR_UNIT* m_pLidarRoll;
+	LIDAR_UNIT* m_pLidarPitch;
 
 	//Common classes
 //	VehicleLink m_VLink;
@@ -101,7 +106,7 @@ public:
 	bool m_bHostConnected;
 
 	//General
-	uint8_t m_opeMode;
+	int8_t m_opeMode;
 	bool m_bMpuInterrupt;
 
 	unsigned long m_timeNow;

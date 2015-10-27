@@ -25,10 +25,10 @@ public:
 
 
 	//Switches
-	uint16_t m_prevModeSwitch;
-	uint16_t m_inputPPM[RC_CHANNEL_NUM];
-	uint16_t* m_pModeSwitch;
-	uint8_t* m_pOpeMode;
+	int16_t m_prevModeSwitch;
+	int16_t m_inputPPM[RC_CHANNEL_NUM];
+	int16_t* m_pModeSwitch;
+	int8_t* m_pOpeMode;
 
 	uint8_t m_ppmROLL;
 	uint8_t m_ppmPITCH;
