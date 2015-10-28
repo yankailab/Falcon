@@ -61,6 +61,12 @@ struct config_t
 	float m_divergeFactor;
 	float m_pwmFactor;
 	long m_inputDtime;
+
+	uint8_t m_LidarIdxUP;
+	uint8_t m_LidarIdxL;
+	uint8_t m_LidarIdxR;
+	uint8_t m_LidarIdxF;
+	uint8_t m_LidarIdxB;
 };
 
 

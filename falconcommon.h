@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 33
+#define VERSION 39
 
 #define ATMEGA_A32U4
 //#define ATMEGA_A328
@@ -81,6 +81,7 @@
 #define PPM_OUTPUT_PIN	A7				//5 for arduino pro micro,set PPM signal output pin on the arduino
 #define PPM_INPUT_INT 0
 #define NUM_LIDAR 4
+
 #endif
 
 #ifdef UART_RC_BRIDGE
