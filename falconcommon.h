@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define VERSION 39
+#define VERSION 46
 
 #define ATMEGA_A32U4
 //#define ATMEGA_A328

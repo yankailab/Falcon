@@ -230,7 +230,11 @@ int LIDARLite::distance(bool stablizePreampFlag, bool takeReference, char LidarL
   // Array to store high and low bytes of distance
   byte distanceArray[2];
   // Read two bytes from register 0x8f. (See autoincrement note above)
-  read(0x8f,2,distanceArray,true,LidarLiteI2cAddress);
+  if (!read(0x8f, 2, distanceArray, true, LidarLiteI2cAddress))
+  {
+	  return -1;
+  }
+
   // Shift high byte and add to low byte
   int distance = (distanceArray[0] << 8) + distanceArray[1];
   return(distance);
@@ -653,7 +657,10 @@ unsigned char LIDARLite::changeAddress(char newI2cAddress,  bool disablePrimaryA
 
 /* =============================================================================
   =========================================================================== */
-void LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool monitorBusyFlag, char LidarLiteI2cAddress){
+
+#define BUSY_LIM 50
+
+bool LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool monitorBusyFlag, char LidarLiteI2cAddress){
   int busyFlag = 0;
   if(monitorBusyFlag){
     busyFlag = 1;
@@ -668,7 +675,7 @@ void LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool m
     busyFlag = bitRead(Wire.read(),0);
 
     busyCounter++;
-    if(busyCounter > 9999){
+    if(busyCounter > BUSY_LIM){
       if(errorReporting){
         int errorExists = 0;
         Wire.beginTransmission((int)LidarLiteI2cAddress);
@@ -714,9 +721,13 @@ void LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool m
       }
     }
   }
-  if(busyCounter > 9999){
+  if (busyCounter > BUSY_LIM){
     bailout:
       busyCounter = 0;
       Serial.println("> Bailout");
+
+	  return false;
   }
+
+  return true;
 }

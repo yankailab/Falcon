@@ -18,7 +18,7 @@ class LIDARLite
       unsigned char changeAddress(char, bool = false, char = 0x62);
       void changeAddressMultiPwrEn(int , int* , unsigned char* , bool = false);
       void write(char, char, char = 0x62);
-      void read(char, int, byte*, bool, char);
+      bool read(char, int, byte*, bool, char);
   private:
       static bool errorReporting;
 };

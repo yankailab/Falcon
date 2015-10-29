@@ -14,6 +14,7 @@ struct Lidar_Setting
 	long m_I;
 	long m_Imax;
 	long m_D;
+	float m_wNewRead;	//weight for new reading
 };
 
 struct LIDAR_UNIT
@@ -77,6 +78,7 @@ public:
 	void deviceLoop(void);
 	void setDefaultParameters(void);
 	void serialPrint(void);
+	void resetLidar(void);
 
 	void decideRollLidar();
 	void referenceLock();
