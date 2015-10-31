@@ -8,7 +8,7 @@ void PPMInput::init(void)
 
 	//PPM input/output
 	m_bPPMthrough = 0xffff; //through mode for all channels, 00011111
-	m_pModeSwitch = &m_inputPPM[m_ppmMODE];
+//	m_pModeSwitch = &m_inputPPM[m_ppmMODE];
 	m_prevModeSwitch = 0;
 }
 
@@ -30,14 +30,21 @@ void PPMInput::ppmInt(void)
 		{
 			if (*m_pOpeMode == OPE_ALL_COLLISION_AVOID)
 			{
-				if (m_ppmIdx == m_ppmTHROTTLE)
+				m_pulseLength = constrain(m_pulseLength, m_PWMLimLow[m_ppmIdx], m_PWMLimHigh[m_ppmIdx]);
+
+/*				if (m_ppmIdx == m_ppmTHROTTLE)
 				{
-					if (m_pulseLength >= 1580)
-					{
-						m_pulseLength = 1580;
-					}
+					m_pulseLength = constrain(m_pulseLength, m_cAvoidThrLowLim, m_cAvoidThrHighLim);
 				}
-			}
+				else if (m_ppmIdx == m_ppmROLL)
+				{
+					m_pulseLength = constrain(m_pulseLength, m_cAvoidRollLowLim, m_cAvoidRollHighLim);
+				}
+				else if (m_ppmIdx == m_ppmPITCH)
+				{
+					m_pulseLength = constrain(m_pulseLength, m_cAvoidPitchLowLim, m_cAvoidPitchHighLim);
+				}
+*/			}
 
 			m_pPPMOut[m_ppmIdx] = m_pulseLength;
 		}

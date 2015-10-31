@@ -14,7 +14,9 @@ struct Lidar_Setting
 	long m_I;
 	long m_Imax;
 	long m_D;
-	float m_wNewRead;	//weight for new reading
+//	float m_wNewRead;	//weight for new reading
+	long m_criticalRegion;
+	int  m_dSpeed;
 };
 
 struct LIDAR_UNIT
@@ -25,7 +27,7 @@ struct LIDAR_UNIT
 	long m_integErr;
 	long m_diverge;
 
-	bool m_bLocked;
+//	bool m_bLocked;
 
 	Lidar_Setting m_setting;
 };
@@ -36,8 +38,9 @@ struct config_t
 
 	int16_t PPMframeLength;
 	int16_t PPMPulseLength;
-	int16_t PWMLenFrom;
+	int16_t PWMLenFrom;	//Output range in controlled mode
 	int16_t PWMLenTo;
+	int16_t PWMRange;	//Output range in through mode
 	int16_t PWMCenter;
 
 	unsigned char m_ppmIdxRoll;
@@ -48,7 +51,6 @@ struct config_t
 
 	long lidarLim[NUM_LIDAR];
 	long cAvoidPWM[NUM_LIDAR];
-	int16_t PWM_THR_UP_Lim;
 	uint8_t cAvoidALT_PPMIdx;
 	uint8_t cAvoidROLL_PPMIdx;
 
@@ -56,14 +58,15 @@ struct config_t
 	long m_errLim;
 	long m_lidarRangeMax;
 	long m_lidarRangeMin;
-	long m_rollDSpeed; //difference in CM
-	long m_altDSpeed;
+//	long m_rollDSpeed; //difference in CM
+//	long m_altDSpeed;
 	long m_deadZone;
 	float m_divergeFactor;
 	float m_pwmFactor;
 	long m_inputDtime;
 
 	uint8_t m_LidarIdxUP;
+	uint8_t m_LidarIdxDOWN;
 	uint8_t m_LidarIdxL;
 	uint8_t m_LidarIdxR;
 	uint8_t m_LidarIdxF;
@@ -80,8 +83,13 @@ public:
 	void serialPrint(void);
 	void resetLidar(void);
 
-	void decideRollLidar();
+	void startRefLock(void);
+	void decideLidar(LIDAR_UNIT* pUseLidar, LIDAR_UNIT* pLidar1, LIDAR_UNIT* pLidar2);
 	void referenceLock();
+	void updateLidar(LIDAR_UNIT* pLidar, float factor);
+	void updateRefLockPWM(LIDAR_UNIT* pLidar, uint16_t* pPWM);
+	void updateStickInput(LIDAR_UNIT* pLidar, int16_t PWM);
+
 	void collisionAvoid();
 
 public:
@@ -94,12 +102,23 @@ public:
 	LIDARLite m_LidarLite;
 	LIDAR_UNIT m_pLidar[NUM_LIDAR];
 	LIDAR_UNIT* m_pLidarUP;
+	LIDAR_UNIT* m_pLidarDOWN;
 	LIDAR_UNIT* m_pLidarL;
 	LIDAR_UNIT* m_pLidarR;
 	LIDAR_UNIT* m_pLidarF;
 	LIDAR_UNIT* m_pLidarB;
 	LIDAR_UNIT* m_pLidarRoll;
 	LIDAR_UNIT* m_pLidarPitch;
+	LIDAR_UNIT* m_pLidarAlt;
+
+	//PWM
+	uint16_t* m_pPWMOutPitch;
+	uint16_t* m_pPWMOutRoll;
+	uint16_t* m_pPWMOutThrottle;
+
+	uint16_t* m_pPWMInPitch;
+	uint16_t* m_pPWMInRoll;
+	uint16_t* m_pPWMInThrottle;
 
 	//Common classes
 //	VehicleLink m_VLink;
@@ -114,7 +133,7 @@ public:
 	bool m_bHostConnected;
 
 	//General
-	int8_t m_opeMode;
+	uint8_t m_opeMode;
 	bool m_bMpuInterrupt;
 
 	unsigned long m_timeNow;

@@ -264,9 +264,17 @@ int LIDARLite::distance(bool stablizePreampFlag, bool takeReference, char LidarL
       }
 
 ============================================================================= */
-int LIDARLite::distanceContinuous(char LidarLiteI2cAddress){
+int LIDARLite::distanceContinuous(char LidarLiteI2cAddress)
+{
   byte distanceArray[2]; // Array to store high and low bytes of distance
-  read(0x8f,2,distanceArray,false,0x62); // Read two bytes from register 0x8f. (See autoincrement note above)
+
+  // Read two bytes from register 0x8f. (See autoincrement note above)
+  if (!read(0x8f, 2, distanceArray, false, LidarLiteI2cAddress))
+  {
+	  return -1;
+  }
+//  read(0x8f, 2, distanceArray, false, 0x62); // Read two bytes from register 0x8f. (See autoincrement note above)
+  
   int distance = (distanceArray[0] << 8) + distanceArray[1]; // Shift high byte and add to low byte
   return(distance);
 }
