@@ -71,7 +71,7 @@ uint8_t PPMInput::updateModeSwitch(void)
 	{
 		if (m_prevModeSwitch <= SWITCH_LOW || m_prevModeSwitch > SWITCH_MID)
 		{
-			newMode = OPE_ALL_COLLISION_AVOID;
+			newMode = OPE_PPM_THROUGH; //TODO OPE_ALL_COLLISION_AVOID;
 		}
 	}
 	else

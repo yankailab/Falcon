@@ -5,6 +5,15 @@
 #include "LIDARLite.h"
 //#include "VehicleLink.h"
 
+
+#define HISTORY_BUF 9
+#define LIDAR_CALIB_SAMPLE 20
+
+#define LIDAR_MODE 2
+#define LIDAR_CONTINUOUS
+#define LIDAR_INTERVAL 0xc3
+//#define LIDAR_STARTUPCALIB
+
 struct Lidar_Setting
 {
 	unsigned char m_address;
@@ -17,6 +26,8 @@ struct Lidar_Setting
 //	float m_wNewRead;	//weight for new reading
 	long m_criticalRegion;
 	int  m_dSpeed;
+	long m_offset;
+	long m_cAvoidPWM;
 };
 
 struct LIDAR_UNIT
@@ -27,7 +38,8 @@ struct LIDAR_UNIT
 	long m_integErr;
 	long m_diverge;
 
-//	bool m_bLocked;
+	long m_pHistory[HISTORY_BUF];
+	uint8_t m_iHistory;
 
 	Lidar_Setting m_setting;
 };
@@ -50,7 +62,7 @@ struct config_t
 	unsigned char m_ppmIdxMode;
 
 	long lidarLim[NUM_LIDAR];
-	long cAvoidPWM[NUM_LIDAR];
+//	long cAvoidPWM[NUM_LIDAR];
 	uint8_t cAvoidALT_PPMIdx;
 	uint8_t cAvoidROLL_PPMIdx;
 
@@ -64,6 +76,9 @@ struct config_t
 	float m_divergeFactor;
 	float m_pwmFactor;
 	long m_inputDtime;
+
+	uint8_t m_filterWindow;
+	float	m_dTdist;
 
 	uint8_t m_LidarIdxUP;
 	uint8_t m_LidarIdxDOWN;
@@ -89,6 +104,8 @@ public:
 	void updateLidar(LIDAR_UNIT* pLidar, float factor);
 	void updateRefLockPWM(LIDAR_UNIT* pLidar, uint16_t* pPWM);
 	void updateStickInput(LIDAR_UNIT* pLidar, int16_t PWM);
+	long medianFilter(LIDAR_UNIT* pLidar);
+	void lidarCalibration(LIDAR_UNIT* pLidar);
 
 	void collisionAvoid();
 
@@ -99,6 +116,7 @@ public:
 	IMU m_IMU;
 	PPMInput m_PPMInput;
 
+	//Lidar
 	LIDARLite m_LidarLite;
 	LIDAR_UNIT m_pLidar[NUM_LIDAR];
 	LIDAR_UNIT* m_pLidarUP;
