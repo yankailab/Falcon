@@ -10,9 +10,12 @@
 #define LIDAR_CALIB_SAMPLE 20
 
 #define LIDAR_MODE 2
-#define LIDAR_CONTINUOUS
-#define LIDAR_INTERVAL 0xc3
+//#define LIDAR_CONTINUOUS
+#define LIDAR_INTERVAL 0xc0
 //#define LIDAR_STARTUPCALIB
+
+#define PWM_CENTER_HIGH 1650
+#define PWM_CENTER_LOW 1350
 
 struct Lidar_Setting
 {
@@ -28,6 +31,7 @@ struct Lidar_Setting
 	int  m_dSpeed;
 	long m_offset;
 	long m_cAvoidPWM;
+	long m_PWMcenter;
 };
 
 struct LIDAR_UNIT
@@ -53,7 +57,7 @@ struct config_t
 	int16_t PWMLenFrom;	//Output range in controlled mode
 	int16_t PWMLenTo;
 	int16_t PWMRange;	//Output range in through mode
-	int16_t PWMCenter;
+//	int16_t PWMCenter;
 
 	unsigned char m_ppmIdxRoll;
 	unsigned char m_ppmIdxPitch;
@@ -62,7 +66,6 @@ struct config_t
 	unsigned char m_ppmIdxMode;
 
 	long lidarLim[NUM_LIDAR];
-//	long cAvoidPWM[NUM_LIDAR];
 	uint8_t cAvoidALT_PPMIdx;
 	uint8_t cAvoidROLL_PPMIdx;
 
@@ -70,8 +73,6 @@ struct config_t
 	long m_errLim;
 	long m_lidarRangeMax;
 	long m_lidarRangeMin;
-//	long m_rollDSpeed; //difference in CM
-//	long m_altDSpeed;
 	long m_deadZone;
 	float m_divergeFactor;
 	float m_pwmFactor;
@@ -106,6 +107,7 @@ public:
 	void updateStickInput(LIDAR_UNIT* pLidar, int16_t PWM);
 	long medianFilter(LIDAR_UNIT* pLidar);
 	void lidarCalibration(LIDAR_UNIT* pLidar);
+	void checkLockCondition(LIDAR_UNIT* pLidar);
 
 	void collisionAvoid();
 

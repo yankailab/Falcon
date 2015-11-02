@@ -65,9 +65,6 @@ void setup()
 	g_Device.m_pRFSerial = &Serial1;
 #endif
 	
-	g_Device.m_PPMInput.m_pPPMOut = g_ppm;
-	g_Device.deviceSetup();
-
 	// enable Arduino interrupt detection
 	attachInterrupt(6, dmpDataReady, RISING);
 
@@ -76,6 +73,9 @@ void setup()
 
 	attachInterrupt(PPM_INPUT_INT, ppmInt, RISING);
 	//2,3 for I2C, 4 or 5 for GPS port, this is the Arduino INT, not the Atmega2560 INT!
+
+	g_Device.m_PPMInput.m_pPPMOut = g_ppm;
+	g_Device.deviceSetup();
 
 }
 
