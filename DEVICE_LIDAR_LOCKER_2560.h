@@ -26,7 +26,6 @@ struct Lidar_Setting
 	long m_I;
 	long m_Imax;
 	long m_D;
-//	float m_wNewRead;	//weight for new reading
 	long m_criticalRegion;
 	int  m_dSpeed;
 	long m_offset;
@@ -37,6 +36,7 @@ struct Lidar_Setting
 struct LIDAR_UNIT
 {
 	long m_distCM;
+	long m_prevDistCM;
 	long m_lockCM;
 	long m_prevErr;
 	long m_integErr;
@@ -57,13 +57,13 @@ struct config_t
 	int16_t PWMLenFrom;	//Output range in controlled mode
 	int16_t PWMLenTo;
 	int16_t PWMRange;	//Output range in through mode
-//	int16_t PWMCenter;
 
 	unsigned char m_ppmIdxRoll;
 	unsigned char m_ppmIdxPitch;
 	unsigned char m_ppmIdxThrottle;
 	unsigned char m_ppmIdxYaw;
-	unsigned char m_ppmIdxMode;
+	unsigned char m_ppmIdxControlMode;
+	unsigned char m_ppmIdxFlightMode;
 
 	long lidarLim[NUM_LIDAR];
 	uint8_t cAvoidALT_PPMIdx;
@@ -72,13 +72,16 @@ struct config_t
 	Lidar_Setting lidar[NUM_LIDAR];
 	long m_errLim;
 	long m_lidarRangeMax;
-	long m_lidarRangeMin;
+	long m_lidarRefRangeMax;
+	long m_lidarRefRangeMin;
+	long m_lidarRefChangeDist;
 	long m_deadZone;
 	float m_divergeFactor;
 	float m_pwmFactor;
 	long m_inputDtime;
 
 	uint8_t m_filterWindow;
+	uint8_t m_medianIdx;
 	float	m_dTdist;
 
 	uint8_t m_LidarIdxUP;
@@ -99,17 +102,15 @@ public:
 	void serialPrint(void);
 	void resetLidar(void);
 
-	void startRefLock(void);
-	void decideLidar(LIDAR_UNIT* pUseLidar, LIDAR_UNIT* pLidar1, LIDAR_UNIT* pLidar2);
-	void referenceLock();
-	void updateLidar(LIDAR_UNIT* pLidar, float factor);
-	void updateRefLockPWM(LIDAR_UNIT* pLidar, uint16_t* pPWM);
+	LIDAR_UNIT* decideLidar(LIDAR_UNIT* pCurrent, LIDAR_UNIT* pLidar1, LIDAR_UNIT* pLidar2);
+	void updateLidar(LIDAR_UNIT* pLidar, float factor, float dTdist);
+	void updateRefLockPWM(LIDAR_UNIT* pLidar, uint16_t* pPWM, uint8_t ppmIdx);
 	void updateStickInput(LIDAR_UNIT* pLidar, int16_t PWM);
 	long medianFilter(LIDAR_UNIT* pLidar);
 	void lidarCalibration(LIDAR_UNIT* pLidar);
 	void checkLockCondition(LIDAR_UNIT* pLidar);
 
-	void collisionAvoid();
+	void collisionAvoid(LIDAR_UNIT* pLidar, uint16_t* pPWM, uint8_t ppmIdx, int16_t dPwmHigh, int16_t dPwmLow);
 
 public:
 	HardwareSerial* m_pRFSerial;
