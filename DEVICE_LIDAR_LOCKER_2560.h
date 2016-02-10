@@ -6,7 +6,7 @@
 //#include "VehicleLink.h"
 
 
-#define HISTORY_BUF 9
+#define HISTORY_BUF 10
 #define LIDAR_CALIB_SAMPLE 20
 
 #define LIDAR_MODE 2

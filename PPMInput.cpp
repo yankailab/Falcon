@@ -79,7 +79,7 @@ uint8_t PPMInput::updateModeSwitch(void)
 	{
 		if (m_prevModeSwitch <= SWITCH_MID)
 		{
-			newMode = OPE_REFERENCE_LOCK;
+			newMode = OPE_ALL_COLLISION_AVOID;// OPE_REFERENCE_LOCK;
 		}
 	}
 
