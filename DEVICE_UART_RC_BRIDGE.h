@@ -1,120 +1,30 @@
+#include "falconcommon.h"
+#include "VehicleLink.h"
 
-#ifndef ATMEGA_A328
-Serial_* g_pUSBSerial;
-#else
-HardwareSerial* g_pUSBSerial;
-#endif
-
-void deviceSetup()
+class DEVICE_UART_RC_BRIDGE
 {
-#ifndef ATMEGA_A328
-	g_pRFSerial->begin(115200);
-#endif
+public:
+	void deviceSetup();
+	void deviceLoop();
 
-#ifdef USB_DEBUG
-	// wait for Leonardo enumeration, others continue immediately
-	while (!(*g_pUSBSerial));
-#endif
+public:
+	//Common classes
+	VehicleLink m_VLink;
+//	config_t m_config;
 
-	if (*g_pUSBSerial)
-	{
-		//To host side (Android device etc.)
-		g_pUSBSerial->begin(115200);
-		g_bHostConnected = true;
-		g_pUSBSerial->println(F("FALCON_ON"));
-	}
+	//Program
+	int m_counter;
 
-	//Init PPM generator
-	PPM_init(config);
-
-	//Vehicle Link
-	g_VLink.m_pConfig = &config;
-	g_VLink.init();
-	g_VLink.m_pOprMode = &g_opeMode;
+	//switches
+	bool m_bPrintIMU;
+	bool m_bBootSuccess;
+	bool m_bHostConnected;
 
 #ifndef ATMEGA_A328
-	g_VLink.m_pHostSerial = g_pUSBSerial;
-	g_VLink.m_pUartSerial = g_pRFSerial;
+	Serial_* m_pUSBSerial;
 #else
-	g_VLink.m_pHostSerial = g_pUSBSerial;
+	HardwareSerial* m_pUSBSerial;
 #endif
 
-	g_VLink.m_channelValues[config.yawChannel.ppmIdx] = config.PWMCenter;
-	g_VLink.m_channelValues[config.controlChannel[PITCH].ppmIdx] = config.controlChannel[PITCH].center;
-	g_VLink.m_channelValues[config.controlChannel[ROLL].ppmIdx] = config.controlChannel[ROLL].center;
-	g_VLink.m_channelValues[config.throttleChannel.ppmIdx] = config.PWMLenFrom;
-	g_VLink.m_channelValues[config.buttonChannel[0].ppmIdx] = config.buttonChannel[0].modePPM[0];
+};
 
-	g_opeMode = OPE_RC_BRIDGE;
-
-}
-
-void deviceLoop()
-{
-	int i;
-	/*
-	if(g_opeMode==OPE_SERIAL_BRIDGE)
-	{
-		Serial_Bridge();
-		return;
-	}
-	*/
-
-	if (g_bHostConnected)
-	{
-		if (g_VLink.receiveFromHost())
-		{
-			for (i = 0; i < RC_CHANNEL_NUM; i++)
-			{
-				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 1000, 2000);
-			}
-		}
-	}
-	else
-	{
-#ifndef ATMEGA_A328
-		if (g_VLink.receiveFromUART())
-		{
-			for (i = 0; i < RC_CHANNEL_NUM; i++)
-			{
-				g_ppm[i] = constrain((uint16_t)g_VLink.m_channelValues[i], 1000, 2000);
-			}
-		}
-#endif
-	}
-
-
-	// slow rate actions
-	switch (g_counter)
-	{
-	case 1:
-		if (g_bHostConnected)
-		{
-			g_VLink.sendHostHeartBeat();
-		}
-		else
-		{
-#ifndef ATMEGA_A328
-			g_VLink.sendUartHeartBeat();
-#endif
-		}
-		break;
-	case 10:
-		if (!g_bHostConnected)
-		{
-			if (Serial)
-			{
-				g_pUSBSerial = &Serial;
-				g_bHostConnected = true;
-			}
-		}
-		break;
-	case 100:
-		g_counter = 0;
-		break;
-
-	default:
-		break;
-	}
-	g_counter++;
-}

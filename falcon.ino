@@ -14,14 +14,19 @@ UI g_UI;
 
 //	COMMON INCLUDES
 #include "EEPROMAnything.h"
-#include "PPMOutput.h"
 
 //#include "DEVICE_COMMON.h"
 //#include "DEVICE_SERIAL_TRANSMITTER.h"
 //#include "DEVICE_SERIAL_RECEIVER.h"
 //#include "DEVICE_RC_TRANSMITTER.h"
-//#include "DEVICE_UART_RC_BRIDGE.h"
 //#include "DEVICE_LIDAR_CONTROLLER.h"
+
+#ifdef UART_RC_BRIDGE
+#include "DEVICE_UART_RC_BRIDGE.h"
+DEVICE_UART_RC_BRIDGE g_Device;
+#endif
+
+#ifdef LIDAR_LOCKER_2560
 #include "DEVICE_LIDAR_LOCKER_2560.h"
 DEVICE_LIDAR_LOCKER_2560 g_Device;
 
@@ -43,12 +48,21 @@ void ppmInt()
 {
 	g_Device.m_PPMInput.ppmInt();
 }
+#endif
 
 //
 //INITIAL SETUP 
 //
 void setup() 
 {
+	//Setting up Serial
+	g_Device.m_pUSBSerial = &Serial;
+#ifndef ATMEGA_A328
+	g_Device.m_pRFSerial = &Serial1;
+#endif
+
+
+#ifdef LIDAR_LOCKER_2560
 	// Read Config or fill with default settings
 	if (EEPROM.read(0) == VERSION)
 	{
@@ -60,11 +74,6 @@ void setup()
 		EEPROM_writeAnything(0, g_Device.m_config);
 	}
 
-	g_Device.m_pUSBSerial = &Serial;
-#ifndef ATMEGA_A328
-	g_Device.m_pRFSerial = &Serial1;
-#endif
-	
 	// enable Arduino interrupt detection
 	attachInterrupt(6, dmpDataReady, RISING);
 
@@ -75,6 +84,8 @@ void setup()
 	//2,3 for I2C, 4 or 5 for GPS port, this is the Arduino INT, not the Atmega2560 INT!
 
 	g_Device.m_PPMInput.m_pPPMOut = g_ppm;
+#endif
+
 	g_Device.deviceSetup();
 
 }

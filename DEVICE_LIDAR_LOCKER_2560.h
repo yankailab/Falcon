@@ -17,6 +17,9 @@
 #define PWM_CENTER_HIGH 1650
 #define PWM_CENTER_LOW 1350
 
+#define NUM_LIDAR 4
+
+
 struct Lidar_Setting
 {
 	unsigned char m_address;

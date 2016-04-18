@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef __PPM_OUTPUT__
+#define __PPM_OUTPUT__
+
 #include "falconcommon.h"
 
 #ifdef ATMEGA_A328
@@ -136,4 +138,6 @@ void PPM_init(int FrLen, int PulseLen)
 	sei();
 #endif
 }
+
+#endif
 

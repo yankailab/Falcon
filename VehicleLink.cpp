@@ -201,7 +201,7 @@ void VehicleLink::init(void)
 	int i;
 	for (i = 0; i < RC_CHANNEL_NUM; i++)
 	{
-		m_channelValues[i] = m_pConfig->PWMCenter;
+		m_channelValues[i] = 1500;// m_pConfig->PWMCenter;
 	}
 
 	m_numChannel = RC_CHANNEL_NUM;
@@ -362,7 +362,7 @@ void VehicleLink::hostCommand(void)
 	switch (m_hostCMD.m_pBuf[2]) //Command
 	{
 	case CMD_RC_UPDATE:
-		if (*m_pOprMode != OPE_RC_BRIDGE)break;
+//		if (*m_pOprMode != OPE_RC_BRIDGE)break;
 
 		numChannel = m_hostCMD.m_pBuf[3];
 		if (m_numChannel > RC_CHANNEL_NUM)

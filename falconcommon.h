@@ -2,17 +2,17 @@
 
 #include <Arduino.h>
 
-#define VERSION 9
+#define VERSION 10
 
-#define ATMEGA_A32U4
-//#define ATMEGA_A328
+//#define ATMEGA_A32U4
+#define ATMEGA_A328
 
 //#define RC_TRANSMITTER
 //#define SERIAL_TRANSMITTER
 //#define SERIAL_RECEIVER
-//#define UART_RC_BRIDGE
+#define UART_RC_BRIDGE
 //#define LIDAR_CONTROLLER
-#define LIDAR_LOCKER_2560
+//#define LIDAR_LOCKER_2560
 
 //#define USB_DEBUG
 
@@ -80,8 +80,6 @@
 #define PPM_ON_STATE	0				//set polarity of the pulses: 1 is positive, 0 is negative
 #define PPM_OUTPUT_PIN	A7				//5 for arduino pro micro,set PPM signal output pin on the arduino
 #define PPM_INPUT_INT 0
-#define NUM_LIDAR 4
-
 #endif
 
 #ifdef UART_RC_BRIDGE

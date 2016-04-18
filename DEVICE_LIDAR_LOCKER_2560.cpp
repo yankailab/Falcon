@@ -1,7 +1,5 @@
 #include "DEVICE_LIDAR_LOCKER_2560.h"
 
-
-
 void DEVICE_LIDAR_LOCKER_2560::deviceSetup(void)
 {
 	uint8_t i;
@@ -580,7 +578,7 @@ void DEVICE_LIDAR_LOCKER_2560::setDefaultParameters(void)
 	m_config.lidar[m_config.m_LidarIdxUP].m_address = 0x70;
 	m_config.lidar[m_config.m_LidarIdxUP].m_pinEN = A3;
 	m_config.lidar[m_config.m_LidarIdxUP].m_offset = 0;
-	m_config.lidar[m_config.m_LidarIdxUP].m_cAvoidPWM = -90;
+	m_config.lidar[m_config.m_LidarIdxUP].m_cAvoidPWM = -200;
 	m_config.lidar[m_config.m_LidarIdxUP].m_PWMcenter = 1500;
 
 	m_config.lidar[m_config.m_LidarIdxL].m_P = -210;
